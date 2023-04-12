@@ -38,3 +38,5 @@ yarn.install: ${APP_DIR}/node_modules
 
 ${APP_DIR}/node_modules: ${APP_DIR}/yarn.lock
 	$(call yarn,install)
+
+${APP_DIR}/yarn.lock: ${APP_DIR}/package.json
