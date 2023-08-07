@@ -1,0 +1,9 @@
+# ======================================== SECURITY SECTION ========================================
+# SetEnvIf X-Forwarded-For "10\.123\.123\.123" ACCESS_ALLOWED
+
+AuthType basic
+AuthName "Restricted access"
+AuthUserFile /var/www/bas/site/clevercloud/.htpasswd
+Require valid-user
+Require env ACCESS_ALLOWED
+# ==================================== END OF SECURITY SECTION =====================================

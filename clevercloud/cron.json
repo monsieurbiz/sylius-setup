@@ -1,0 +1,8 @@
+[
+  "CRON_TZ=Europe/Paris",
+
+  "# Sylius",
+  "0 * * * *      $ROOT/clevercloud/symfony_console.sh sylius:remove-expired-carts",
+  "0 0 * * *      $ROOT/clevercloud/symfony_console.sh sylius:cancel-unpaid-orders",
+  "#0 2 * * *      $ROOT/clevercloud/symfony_console.sh sylius:sitemap:generate"
+]
