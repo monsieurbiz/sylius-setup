@@ -35,16 +35,10 @@ test.schema: ## Validate MySQL Schema
 	$(call symfony.console,doctrine:schema:validate)
 
 test.twig: ## Validate Twig templates
-	${CONSOLE} lint:twig -e prod --no-debug templates/ themes/${EIYOLAB_THEME_NAME}/templates
-	${CONSOLE} lint:twig -e prod --no-debug templates/ themes/${TERRAVITA_THEME_NAME}/templates
-	${CONSOLE} lint:twig -e prod --no-debug templates/ themes/${TOUTELANUTRITION_THEME_NAME}/templates
+	${CONSOLE} lint:twig -e prod --no-debug templates/
 
 test.duplicated-templates:
-	@resources/bin/check-templates.sh ${APP_DIR}/templates ${APP_DIR}/themes/${EIYOLAB_THEME_NAME}/templates
-	@resources/bin/check-templates.sh ${APP_DIR}/templates ${APP_DIR}/themes/${TERRAVITA_THEME_NAME}/templates
-	@resources/bin/check-templates.sh ${APP_DIR}/templates ${APP_DIR}/themes/${TOUTELANUTRITION_THEME_NAME}/templates
+	@resources/bin/check-templates.sh ${APP_DIR}/templates
 
 test.duplicated-templates.fix:
-	@resources/bin/check-templates.sh ${APP_DIR}/templates ${APP_DIR}/themes/${EIYOLAB_THEME_NAME}/templates --fix
-	@resources/bin/check-templates.sh ${APP_DIR}/templates ${APP_DIR}/themes/${TERRAVITA_THEME_NAME}/templates --fix
-	@resources/bin/check-templates.sh ${APP_DIR}/templates ${APP_DIR}/themes/${TOUTELANUTRITION_THEME_NAME}/templates --fix
+	@resources/bin/check-templates.sh ${APP_DIR}/templates --fix

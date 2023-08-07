@@ -77,3 +77,6 @@ symfony.migration.execute: ## Excecute migration file
 
 symfony.migration.migrate: ## Excecute migration file
 	$(call symfony.console, doctrine:migrations:migrate)
+
+symfony.messenger.setup: ## Setup the messenger transports (create messenger_message table)
+	$(call symfony.console,messenger:setup-transports)
