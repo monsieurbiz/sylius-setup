@@ -60,24 +60,18 @@ function setup(): void
     io()->info('Run composer update after updating the composer.json file.');
     run('symfony composer update', path: 'apps/sylius/', timeout: false);
 
-    # Create phpstan.neon
-    $content = <<<NEON
-    parameters:
-        level: max
-        paths:
-            - %rootDir%/src/
-    
-        checkMissingIterableValueType: false
-        checkGenericClassInNonGenericObjectType: false
-    
-        ignoreErrors:
-            - '/Generator expects value type Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface\, object given\./'
-    NEON;
-    file_put_contents('apps/sylius/phpstan.neon', $content);
+    # Copy dist files
+    run('cp -Rv dist/sylius/* apps/sylius/');
+    run('rm -rf dist');
 
-    # Prepare for future plugins
+    # Add missing directories
     fs()->mkdir('apps/sylius/plugins');
     fs()->touch('apps/sylius/plugins/.gitkeep');
+    fs()->mkdir('apps/sylius/src/Resources/config');
+    fs()->touch('apps/sylius/src/Resources/config/.gitkeep');
+
+    # Ignore .php-cs-fixer.cache
+    fs()->appendToFile('apps/sylius/.gitignore', '.php-cs-fixer.cache');
 
     # install
     run('make install', timeout: false);

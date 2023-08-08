@@ -1,0 +1,10 @@
+parameters:
+    level: max
+    paths:
+        - %rootDir%/src/
+
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+
+    ignoreErrors:
+        - '/Generator expects value type Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface\, object given\./'
