@@ -37,7 +37,9 @@ function installPlugins(): void
             run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
         },
         'monsieurbiz/sylius-media-manager-plugin' => function () {},
-        'monsieurbiz/sylius-menu-plugin' => function () {},
+        'monsieurbiz/sylius-menu-plugin' => function () {
+            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
+        },
         'monsieurbiz/sylius-no-commerce-plugin' => function () {},
         'monsieurbiz/sylius-order-history-plugin' => function () {},
         'monsieurbiz/sylius-rich-editor-plugin' => function () {},
