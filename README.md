@@ -2,13 +2,27 @@
 
 ## Howto
 
+You will need [Castor](https://github.com/jolicode/castor#readme) as a task runner, and [symfony](https://github.com/symfony-cli/symfony-cli#readme) as a PHP wrapper.
+
 - Use this template project as a new project in Github.
-- Edit the `.gitignore` file to remove unwanted lines.
-- Edit the `.php-version` as needed.
-- Run `symfony composer create-project --no-scripts sylius/sylius-standard apps/sylius`.
-- Run `make install` to get a clean setup.
-- Replace `MAILER_DSN=null://null` by `MAILER_DSN=smtp://localhost:1025` in `apps/sylius/.env`.
+- Clone your project and run `castor local:setup` inside it.
 - And code!
+
+## Setup Clever Cloud environment
+
+Simply run: `castor clevercloud:setup` and follow the instructions.
+
+Add a password for the HTTP auth using the `htpasswd` utility into `clevercloud/.htpasswd` file.
+
+## Setup Github Environment
+
+You'll need your credentials for Clever Cloud : `clever login` will help you get the required token and secret.
+
+Simply run: `castor github:env:setup` and follow the instructions.
+
+## Install Sylius plugins
+
+After installing Sylius, you can install the plugins you need: `castor sylius:plugins`
 
 ## Questions & Troubleshooting
 
@@ -19,6 +33,8 @@ We use `symfony` as a wrapper for PHP, this way you can change your PHP version 
 According to this composer will install the best version compatible with your computer.
 
 So don't forget to change the `.php-version` to the latest, then you'll probably get the latest Sylius version as well.
+
+Our installation process allows you to forget about this by asking all the required questions.
 
 ## License
 

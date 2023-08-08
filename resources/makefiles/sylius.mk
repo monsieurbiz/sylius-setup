@@ -2,7 +2,7 @@
 ### SYLIUS
 ### ¯¯¯¯¯¯
 
-sylius: dependencies sylius.database sylius.api.generate-keypair sylius.theming.build sylius.fixtures sylius.assets ## Install Sylius
+sylius: dependencies sylius.database symfony.messenger.setup sylius.api.generate-keypair sylius.theming.build sylius.fixtures sylius.assets ## Install Sylius
 .PHONY: sylius
 
 sylius.database: ## Setup the database
@@ -19,7 +19,7 @@ sylius.fixtures.suite:
 
 sylius.assets: ## Install all assets with symlinks
 	$(call symfony.console,sylius:install:assets)
-	$(call symfony.console,assets:install --symlink)
+	$(call symfony.console,assets:install --symlink --relative)
 
 .PHONY: sylius.theming.build
 sylius.theming.build: yarn.install ## Build the themes

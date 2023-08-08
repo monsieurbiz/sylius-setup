@@ -1,6 +1,6 @@
 # To be removed
 /apps/sylius
+/.clever.json
 
 # To keep
-# …
-
+/.castor.stub.php
