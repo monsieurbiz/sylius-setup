@@ -26,7 +26,7 @@ docker.stop: ## Stop the docker containers
 .PHONY: docker.stop
 
 docker.destroy: ## Destroy the containers, volumes, networks…
-	$(call docker-compose,down -v --remove-orphan)
+	$(call docker-compose,down -v --remove-orphans)
 
 docker.down: ## Stop and remove the docker containers
 	$(call docker-compose,down)
