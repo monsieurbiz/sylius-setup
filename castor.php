@@ -40,9 +40,9 @@ function setup(): void
 
     # Project name, description and license
     $repo = trim(run('gh repo view --json nameWithOwner --jq .nameWithOwner | cat', quiet: true)->getOutput());
-    run('symfony composer config set name ' . $repo, path: 'apps/sylius/');
-    run('symfony composer config set description ' . $repo, path: 'apps/sylius/');
-    run('symfony composer config set license proprietary', path: 'apps/sylius/');
+    run('symfony composer config name ' . $repo, path: 'apps/sylius/');
+    run('symfony composer config description ' . $repo, path: 'apps/sylius/');
+    run('symfony composer config license proprietary', path: 'apps/sylius/');
 
     # Add scripts in composer.json
     run('symfony composer config scripts.phpcs "php-cs-fixer fix --allow-risky=yes"', path: 'apps/sylius/');
