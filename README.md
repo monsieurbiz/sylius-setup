@@ -12,6 +12,7 @@ Then you can :
 - Use this template project as a new project in Github.
 - Clone your project and run `castor local:setup` inside it.
 - Clean the castor files if you don't want them in your project with `castor local:clean-up`.
+- Remove the `composer.lock` line in `apps/sylius/.gitignore` if you want to commit it.
 - And code!
 
 ## Setup Clever Cloud environment
