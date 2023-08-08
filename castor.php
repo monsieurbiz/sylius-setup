@@ -48,8 +48,8 @@ function setup(): void
     run('make install', timeout: false);
 
     # GHA
-    run('rm -rf .github');
-    run('mv _.github .github');
+    run('cp -Rv _.github/* .github/');
+    run('rm -rf _.github');
 
     io()->success('Your project has been setup!');
     io()->comment('You can now commit the changes!');
