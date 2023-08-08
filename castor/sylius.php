@@ -14,35 +14,38 @@ use function Castor\run;
 function installPlugins(): void
 {
     $plugins = [
-        'monsieurbiz/sylius-admin-better-login-plugin',
-        'monsieurbiz/sylius-advanced-option-plugin',
-        'monsieurbiz/sylius-alert-message-plugin',
-        'monsieurbiz/sylius-anti-spam-plugin',
-        'monsieurbiz/sylius-cms-page-plugin',
-        'monsieurbiz/sylius-coliship-plugin',
-        'monsieurbiz/sylius-contact-request-plugin',
-        'monsieurbiz/sylius-homepage-plugin',
-        'monsieurbiz/sylius-media-manager-plugin',
-        'monsieurbiz/sylius-menu-plugin',
-        'monsieurbiz/sylius-no-commerce-plugin',
-        'monsieurbiz/sylius-order-history-plugin',
-        'monsieurbiz/sylius-rich-editor-plugin',
-        'monsieurbiz/sylius-sales-reports-plugin',
-        'monsieurbiz/sylius-search-plugin',
-        'monsieurbiz/sylius-settings-plugin',
-        'monsieurbiz/sylius-shipping-slot-plugin',
+        'monsieurbiz/sylius-admin-better-login-plugin' => function () {},
+        'monsieurbiz/sylius-advanced-option-plugin' => function () {},
+        'monsieurbiz/sylius-alert-message-plugin' => function () {},
+        'monsieurbiz/sylius-anti-spam-plugin' => function () {},
+        'monsieurbiz/sylius-cms-page-plugin' => function () {},
+        'monsieurbiz/sylius-coliship-plugin' => function () {},
+        'monsieurbiz/sylius-contact-request-plugin' => function () {},
+        'monsieurbiz/sylius-homepage-plugin' => function () {},
+        'monsieurbiz/sylius-media-manager-plugin' => function () {},
+        'monsieurbiz/sylius-menu-plugin' => function () {},
+        'monsieurbiz/sylius-no-commerce-plugin' => function () {},
+        'monsieurbiz/sylius-order-history-plugin' => function () {},
+        'monsieurbiz/sylius-rich-editor-plugin' => function () {},
+        'monsieurbiz/sylius-sales-reports-plugin' => function () {},
+        'monsieurbiz/sylius-search-plugin' => function () {},
+        'monsieurbiz/sylius-settings-plugin' => function () {},
+        'monsieurbiz/sylius-shipping-slot-plugin' => function () {},
     ];
 
     $question = new ChoiceQuestion(
         'Please select the plugins you want to install',
-        $plugins
+        array_keys($plugins)
     );
     $question->setMultiselect(true);
 
     $selectedPlugins = io()->askQuestion($question);
 
-    io()->info('Installing ' . implode(', ', $selectedPlugins) . '…');
-    $pluginsAsString = implode(' ', $selectedPlugins);
-    run('symfony composer config --no-plugins --json extra.symfony.endpoint \'["https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]\'', path: 'apps/sylius');
-    run('symfony composer require ' . $pluginsAsString, path: 'apps/sylius');
+    foreach ($selectedPlugins as $selectedPlugin) {
+        io()->info('Installing ' . $selectedPlugin . '…');
+        run('symfony composer config --no-plugins --json extra.symfony.endpoint \'["https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]\'', path: 'apps/sylius');
+        run('symfony composer require ' . $selectedPlugin, path: 'apps/sylius');
+        $plugins[$selectedPlugin]();
+        io()->info('Installed ' . $selectedPlugin . '…');
+    }
 }
