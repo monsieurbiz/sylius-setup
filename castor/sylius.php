@@ -41,9 +41,10 @@ function installPlugins(): void
 
     $selectedPlugins = io()->askQuestion($question);
 
+    run('symfony composer config --no-plugins --json extra.symfony.endpoint \'["https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]\'', path: 'apps/sylius');
+
     foreach ($selectedPlugins as $selectedPlugin) {
         io()->info('Installing ' . $selectedPlugin . '…');
-        run('symfony composer config --no-plugins --json extra.symfony.endpoint \'["https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]\'', path: 'apps/sylius');
         run('symfony composer require ' . $selectedPlugin, path: 'apps/sylius');
         $plugins[$selectedPlugin]();
         io()->info('Installed ' . $selectedPlugin . '…');
