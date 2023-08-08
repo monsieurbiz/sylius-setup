@@ -37,6 +37,12 @@ function setup(): void
     file_put_contents('apps/sylius/.env.dev', 'MAILER_DSN=smtp://localhost:1025');
     file_put_contents('apps/sylius/.php-version', $phpVersion);
 
+    # Project name, description and license
+    $repo = trim(run('gh repo view --json nameWithOwner --jq .nameWithOwner | cat', quiet: true)->getOutput());
+    run('symfony composer config set name ' . $repo, path: 'apps/sylius/');
+    run('symfony composer config set description ' . $repo, path: 'apps/sylius/');
+    run('symfony composer config set license proprietary', path: 'apps/sylius/');
+
     # Fix for sylius and doctrine conflict
     io()->info('Add conflict for doctrine/orm in order to fix an issue in Sylius.');
     run("cat composer.json | jq --indent 4 '.conflict += {\"doctrine/orm\": \">= 2.15.2\"}' > composer.json.tmp", path: 'apps/sylius/');
