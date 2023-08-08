@@ -42,7 +42,7 @@ function setup(): void
     run("cat composer.json | jq --indent 4 '.conflict += {\"doctrine/orm\": \">= 2.15.2\"}' > composer.json.tmp", path: 'apps/sylius/');
     run('mv composer.json.tmp composer.json', path: 'apps/sylius/');
     io()->info('Run composer update after updating the composer.json file.');
-    run('symfony composer update', path: 'apps/sylius/');
+    run('symfony composer update', path: 'apps/sylius/', timeout: false);
 
     # install
     run('make install', timeout: false);
