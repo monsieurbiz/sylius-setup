@@ -135,8 +135,8 @@ function setupEnv(object $project): string
         ));
     };
 
-    $bucketHost = run(sprintf('clever env -a %1$s | grep BUCKET_HOST | cut -d"=" -f2', $project->env), quiet: true)->getOutput();
-    $databaseUri = run(sprintf('clever env -a %1$s | grep MYSQL_ADDON_URI | cut -d"=" -f2', $project->env), quiet: true)->getOutput();
+    $bucketHost = trim(run(sprintf('clever env -a %1$s | grep BUCKET_HOST | cut -d"=" -f2', $project->env), quiet: true)->getOutput());
+    $databaseUri = trim(run(sprintf('clever env -a %1$s | grep MYSQL_ADDON_URI | cut -d"=" -f2', $project->env), quiet: true)->getOutput());
     $hostname = io()->ask('Which domain for fixtures?', default: sprintf('%s.cleverapps.io', $project->id));
 
     $setEnv('CC_PHP_VERSION', '8.2');
@@ -152,7 +152,7 @@ function setupEnv(object $project): string
     $setEnv('CC_WORKER_RESTART_DELAY', '5');
     $setEnv('APP_ENV', $project->env);
     $setEnv('APP_DEBUG', '0');
-    $setEnv('DATABASE_URI', $databaseUri);
+    $setEnv('DATABASE_URL', $databaseUri);
     $setEnv('MAINTENANCE', 'false');
     $setEnv('IS_PROTECTED', 'true');
     $setEnv('APP_SECRET', md5(random_bytes(32)));
