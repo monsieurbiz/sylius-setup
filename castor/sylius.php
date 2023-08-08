@@ -59,4 +59,6 @@ function installPlugins(): void
         $plugins[$selectedPlugin]();
         io()->info('Installed ' . $selectedPlugin . '…');
     }
+
+    run('rm -rf apps/sylius/var/cache');
 }
