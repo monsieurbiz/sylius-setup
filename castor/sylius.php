@@ -16,7 +16,9 @@ function installPlugins(): void
     $plugins = [
         'monsieurbiz/sylius-admin-better-login-plugin' => function () {},
         // 'monsieurbiz/sylius-advanced-option-plugin' => function () {}, // Compatibility <1.11
-        'monsieurbiz/sylius-alert-message-plugin' => function () {},
+        'monsieurbiz/sylius-alert-message-plugin' => function () {
+            run('symfony console doctrine:migrations:migrate');
+        },
         'monsieurbiz/sylius-anti-spam-plugin' => function () {},
         'monsieurbiz/sylius-cms-page-plugin' => function () {},
         'monsieurbiz/sylius-coliship-plugin' => function () {},
