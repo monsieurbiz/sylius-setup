@@ -28,10 +28,14 @@ function installPlugins(): void
             run('symfony console  doctrine:migrations:diff --namespace="App\Migrations" || true', path: 'apps/sylius'); // Generate app migration
             run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run app migrations
         },
-        'monsieurbiz/sylius-cms-page-plugin' => function () {},
+        'monsieurbiz/sylius-cms-page-plugin' => function () {
+            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
+        },
         'monsieurbiz/sylius-coliship-plugin' => function () {},
         'monsieurbiz/sylius-contact-request-plugin' => function () {},
-        'monsieurbiz/sylius-homepage-plugin' => function () {},
+        'monsieurbiz/sylius-homepage-plugin' => function () {
+            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
+        },
         'monsieurbiz/sylius-media-manager-plugin' => function () {},
         'monsieurbiz/sylius-menu-plugin' => function () {},
         'monsieurbiz/sylius-no-commerce-plugin' => function () {},
