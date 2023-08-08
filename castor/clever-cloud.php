@@ -20,6 +20,9 @@ function cleverSetup(): void
     $hostname = setupEnv($project);
     setupClevercloudFiles($project);
     setupDomain($project, $hostname);
+    if (io()->confirm("Do you want to setup credentials for protected environment?")) {
+        setupHtpasswd();
+    }
 
     io()->success('Your project is ready!');
 }
@@ -179,6 +182,14 @@ function setupDomain(object $project, string $hostname): void
         $hostname,
         $project->env
     ));
+}
+
+#[AsTask(name: 'htpasswd', namespace: 'clevercloud', description: 'Fill the htpasswd file with new credentials')]
+function setupHtpasswd(): void
+{
+    $username = io()->ask("Username");
+    $password = io()->askHidden("Password");
+    run(sprintf('htpasswd -b clevercloud/.htpasswd "%s" "%s"', $username, $password));
 }
 
 function cleverIsRequired(): void
