@@ -54,3 +54,13 @@ function setup(): void
     io()->success('Your project has been setup!');
     io()->comment('You can now commit the changes!');
 }
+
+#[AsTask(namespace: 'local', description: 'Clean up files used for setup')]
+function cleanUp(): void
+{
+    if (io()->confirm('Are you sure? This is a destructive action!', false)) {
+        run('rm -rf castor');
+        run('rm castor.php');
+        io()->success('Clean up done!');
+    }
+}
