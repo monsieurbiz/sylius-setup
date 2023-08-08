@@ -43,6 +43,10 @@ function setup(): void
     run('symfony composer config set description ' . $repo, path: 'apps/sylius/');
     run('symfony composer config set license proprietary', path: 'apps/sylius/');
 
+    # Add scripts in composer.json
+    run('symfony composer config scripts.phpcs "php-cs-fixer fix --allow-risky=yes"', path: 'apps/sylius/');
+    run('symfony composer config scripts.phpmd "phpmd src/,plugins/ ansi phpmd.xml --exclude src/Migrations"', path: 'apps/sylius/');
+
     # Fix for sylius and doctrine conflict
     io()->info('Add conflict for doctrine/orm in order to fix an issue in Sylius.');
     run("cat composer.json | jq --indent 4 '.conflict += {\"doctrine/orm\": \">= 2.15.2\"}' > composer.json.tmp", path: 'apps/sylius/');
