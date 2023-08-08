@@ -2,10 +2,16 @@
 
 ## Howto
 
-You will need [Castor](https://github.com/jolicode/castor#readme) as a task runner, and [symfony](https://github.com/symfony-cli/symfony-cli#readme) as a PHP wrapper.
+You will need : 
+- [Castor](https://github.com/jolicode/castor#readme) as a task runner
+- [symfony](https://github.com/symfony-cli/symfony-cli#readme) as a PHP wrapper.
+- [jq](https://jqlang.github.io/jq/download/) as a command-line JSON processor.
+
+Then you can : 
 
 - Use this template project as a new project in Github.
 - Clone your project and run `castor local:setup` inside it.
+- Clean the castor files if you don't want them in your project with `castor local:clean-up`.
 - And code!
 
 ## Setup Clever Cloud environment
