@@ -43,5 +43,6 @@ function installPlugins(): void
 
     io()->info('Installing ' . implode(', ', $selectedPlugins) . '…');
     $pluginsAsString = implode(' ', $selectedPlugins);
+    run('symfony composer config --no-plugins --json extra.symfony.endpoint \'["https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]\'', path: 'apps/sylius');
     run('symfony composer require ' . $pluginsAsString, path: 'apps/sylius');
 }
