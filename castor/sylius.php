@@ -19,7 +19,15 @@ function installPlugins(): void
         'monsieurbiz/sylius-alert-message-plugin' => function () {
             run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
         },
-        'monsieurbiz/sylius-anti-spam-plugin' => function () {},
+        'monsieurbiz/sylius-anti-spam-plugin' => function () {
+            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
+            // Update Customer Entity - User operation
+            io()->info('Implements the interface `\MonsieurBiz\SyliusAntiSpamPlugin\Entity\QuarantineItemAwareInterface` in your Customer entity.');
+            io()->info('Use the trait `\MonsieurBiz\SyliusAntiSpamPlugin\Entity\QuarantineItemAwareTrait` in your Customer entity.');
+            while (!io()->confirm('Have you changed your Customer entity correctly ?', false));
+            run('symfony console  doctrine:migrations:diff --namespace="App\Migrations" || true', path: 'apps/sylius'); // Generate app migration
+            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run app migrations
+        },
         'monsieurbiz/sylius-cms-page-plugin' => function () {},
         'monsieurbiz/sylius-coliship-plugin' => function () {},
         'monsieurbiz/sylius-contact-request-plugin' => function () {},
