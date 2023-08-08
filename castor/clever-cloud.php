@@ -146,7 +146,7 @@ function setupEnv(object $project): string
     $setEnv('CC_PRE_BUILD_HOOK', './clevercloud/pre_build_hook.sh');
     $setEnv('CC_PRE_RUN_HOOK', './clevercloud/pre_run_hook.sh');
     $setEnv('CC_RUN_SUCCEEDED_HOOK', './clevercloud/run_succeeded_hook.sh');
-    $setEnv('CC_TROUBLESHOOT', 'false');
+    $setEnv('CC_TROUBLESHOOT', 'true');
     $setEnv('CC_WORKER_COMMAND_1', '"clevercloud/symfony_console.sh messenger:consume main --time-limit=300 --failure-limit=1 --memory-limit=512M --sleep=5"');
     $setEnv('CC_WORKER_RESTART', 'always');
     $setEnv('CC_WORKER_RESTART_DELAY', '5');
