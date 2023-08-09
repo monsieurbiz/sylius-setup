@@ -38,11 +38,15 @@ function setup(): void
     file_put_contents('apps/sylius/.env.dev', 'MAILER_DSN=smtp://localhost:1025');
     file_put_contents('apps/sylius/.php-version', $phpVersion);
 
-    # Project name, description and license
+    # Cleanup the composer.json
     $repo = trim(run('gh repo view --json nameWithOwner --jq .nameWithOwner | cat', quiet: true)->getOutput());
     run('symfony composer config name ' . $repo, path: 'apps/sylius/');
     run('symfony composer config description ' . $repo, path: 'apps/sylius/');
     run('symfony composer config license proprietary', path: 'apps/sylius/');
+    run('symfony composer config --unset homepage', path: 'apps/sylius/');
+    run('symfony composer config --unset authors', path: 'apps/sylius/');
+    run('symfony composer config --unset keywords', path: 'apps/sylius/');
+    run('symfony composer config require.php "^' . $phpVersion . '"', path: 'apps/sylius/');
 
     # Add scripts in composer.json
     run('symfony composer config scripts.phpcs "php-cs-fixer fix --allow-risky=yes"', path: 'apps/sylius/');
@@ -79,6 +83,10 @@ function setup(): void
     # GHA
     run('cp -Rv _.github/* .github/');
     run('rm -rf _.github');
+    run('rm -rf apps/sylius/.github');
+
+    # Clean up Sylius
+    run('rm -rf apps/sylius/{Dockerfile}');
 
     # Fix PHP CS
     run('make test.phpcs.fix', timeout: false);
