@@ -32,6 +32,7 @@ function installPlugins(): void
             run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
         'monsieurbiz/sylius-coliship-plugin' => function () {
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius');
             run('symfony console doctrine:migrations:diff --namespace="App\Migrations" || true', path: 'apps/sylius'); // Generate plugin migration - Not in plugin
             run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run generated migration
         },
@@ -51,10 +52,12 @@ function installPlugins(): void
         'monsieurbiz/sylius-sales-reports-plugin' => function () {},
         'monsieurbiz/sylius-search-plugin' => function () {},
         'monsieurbiz/sylius-settings-plugin' => function () {},
-        'monsieurbiz/sylius-shipping-slot-plugin' => function () {},
+        'monsieurbiz/sylius-shipping-slot-plugin' => function () {
+
+        },
         'monsieurbiz/sylius-theme-companion-plugin' => function () {
             run('symfony composer patch-add sylius/theme-bundle "Remove performNoDeepMerging to authorise theme folder" "https://patch-diff.githubusercontent.com/raw/Sylius/SyliusThemeBundle/pull/128.patch"', path: 'apps/sylius');
-            run('symfony composer install sylius/theme-bundle', path: 'apps/sylius');
+            run('symfony composer update sylius/theme-bundle', path: 'apps/sylius');
         },
         'monsieurbiz/sylius-tailwind-theme' => function () {
             run('symfony composer require monsieurbiz/sylius-tailwind-theme', path: 'apps/sylius');
@@ -64,7 +67,7 @@ function installPlugins(): void
             while (!io()->confirm('Did you update your webpack.config.js file?', false));
             run('yarn add daisyui@^2.50.0', path: 'apps/sylius');
             run('yarn add postcss-loader@^7.0.0 --dev', path: 'apps/sylius');
-            run('yarn encore dev', path: 'apps/sylius');
+            run('yarn encore prod', path: 'apps/sylius');
         },
         'synolia/sylius-scheduler-command-plugin' => function () {
             io()->info('Update your clevercloud/cron.json by adding this new line:');
@@ -92,4 +95,8 @@ function installPlugins(): void
     }
 
     run('rm -rf apps/sylius/var/cache');
+
+    if (io()->ask('Would you like to re-run the fixtures?')) {
+        run('make sylius.fixtures');
+    }
 }

@@ -32,6 +32,10 @@ Simply run: `castor github:env:setup` and follow the instructions.
 
 After installing Sylius, you can install the plugins you need: `castor sylius:plugins`
 
+### Themes
+
+You can find some themes in [themes-examples/](themes-examples/themes/) and follow their README.
+
 ## Questions & Troubleshooting
 
 ### Which version of Sylius am I installing?

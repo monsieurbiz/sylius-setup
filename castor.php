@@ -39,14 +39,18 @@ function setup(): void
     file_put_contents('apps/sylius/.php-version', $phpVersion);
 
     # Cleanup the composer.json
-    $repo = trim(run('gh repo view --json nameWithOwner --jq .nameWithOwner | cat', quiet: true)->getOutput());
-    run('symfony composer config name ' . $repo, path: 'apps/sylius/');
-    run('symfony composer config description ' . $repo, path: 'apps/sylius/');
+    $repo = capture('gh repo view --json nameWithOwner --jq .nameWithOwner | cat');
+    if ($repo === 'no git remotes found') {
+        $repo = "monsieurbiz/project";
+    }
+    run('symfony composer config name "' . $repo . '"', path: 'apps/sylius/');
+    run('symfony composer config description "' . $repo . '"', path: 'apps/sylius/');
     run('symfony composer config license proprietary', path: 'apps/sylius/');
     run('symfony composer config --unset homepage', path: 'apps/sylius/');
     run('symfony composer config --unset authors', path: 'apps/sylius/');
     run('symfony composer config --unset keywords', path: 'apps/sylius/');
-    run('symfony composer config require.php "^' . $phpVersion . '"', path: 'apps/sylius/');
+    run('symfony composer config extra.symfony.allow-contrib true', path: 'apps/sylius/');
+    run('symfony composer require php="^' . $phpVersion . '"', path: 'apps/sylius/');
 
     # Add scripts in composer.json
     run('symfony composer config scripts.phpcs "php-cs-fixer fix --allow-risky=yes"', path: 'apps/sylius/');
@@ -77,8 +81,9 @@ function setup(): void
     fs()->mkdir('apps/sylius/src/Resources/config');
     fs()->touch('apps/sylius/src/Resources/config/.gitignore');
 
-    # Ignore .php-cs-fixer.cache
-    fs()->appendToFile('apps/sylius/.gitignore', '.php-cs-fixer.cache');
+    # Ignore .php-cs-fixer.cache and _themes in public
+    fs()->appendToFile('apps/sylius/.gitignore', '/.php-cs-fixer.cache');
+    fs()->appendToFile('apps/sylius/.gitignore', '/public/_themes');
 
     # install
     run('make install', timeout: false);
@@ -90,7 +95,6 @@ function setup(): void
 
     # Clean up Sylius
     run('rm -rf apps/sylius/Dockerfile');
-    run('rm -rf apps/sylius/themes/.gitignore');
     run('rm -rf apps/sylius/src/Entity/.gitignore');
 
     # Fix PHP CS
@@ -98,6 +102,7 @@ function setup(): void
 
     io()->success('Your project has been setup!');
     io()->comment('You can now commit the changes!');
+    io()->info('And setup your themes! (see the README.md)');
 }
 
 #[AsTask(namespace: 'local', description: 'Clean up files used for setup')]
