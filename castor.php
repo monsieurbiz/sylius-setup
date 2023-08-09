@@ -70,9 +70,9 @@ function setup(): void
 
     # Add missing directories
     fs()->mkdir('apps/sylius/plugins');
-    fs()->touch('apps/sylius/plugins/.gitkeep');
+    fs()->touch('apps/sylius/plugins/.gitignore');
     fs()->mkdir('apps/sylius/src/Resources/config');
-    fs()->touch('apps/sylius/src/Resources/config/.gitkeep');
+    fs()->touch('apps/sylius/src/Resources/config/.gitignore');
 
     # Ignore .php-cs-fixer.cache
     fs()->appendToFile('apps/sylius/.gitignore', '.php-cs-fixer.cache');
