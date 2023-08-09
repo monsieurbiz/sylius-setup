@@ -52,6 +52,16 @@ function installPlugins(): void
         'monsieurbiz/sylius-search-plugin' => function () {},
         'monsieurbiz/sylius-settings-plugin' => function () {},
         'monsieurbiz/sylius-shipping-slot-plugin' => function () {},
+        'monsieurbiz/sylius-theme-companion-plugin' => function () {
+            run('symfony composer patch-add sylius/theme-bundle "Remove performNoDeepMerging to authorise theme folder" "https://patch-diff.githubusercontent.com/raw/Sylius/SyliusThemeBundle/pull/128.patch"', path: 'apps/sylius');
+            run('symfony composer install sylius/theme-bundle', path: 'apps/sylius');
+        },
+        'synolia/sylius-scheduler-command-plugin' => function () {
+            io()->info('Update your clevercloud/cron.json by adding this new line:');
+            io()->block('"0 0 * * *      $ROOT/clevercloud/symfony_console.sh synolia:scheduler-run",');
+            while (!io()->confirm('Have you updated your cron.json?', false));
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
+        },
     ];
 
     $question = new ChoiceQuestion(
