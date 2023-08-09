@@ -61,12 +61,9 @@ function installPlugins(): void
         },
         'monsieurbiz/sylius-tailwind-theme' => function () {
             run('symfony composer require monsieurbiz/sylius-tailwind-theme', path: 'apps/sylius');
-            io()->info('Add this line into your webpack.config.js file: (at the end, before the module.exports statement)');
-            io()->block("const syliusTailwindThemeConfig = require('./vendor/monsieurbiz/sylius-tailwind-theme/webpack.config');");
-            io()->info('And update the module.exports statement as well by adding the syliusTailwindThemeConfig variable.');
+            io()->info('Update the module.exports statement as well by adding the syliusTailwindThemeConfig variable.');
             while (!io()->confirm('Did you update your webpack.config.js file?', false));
-            run('yarn add daisyui@^2.50.0', path: 'apps/sylius');
-            run('yarn add postcss-loader@^7.0.0 --dev', path: 'apps/sylius');
+            run('yarn install --force', path: 'apps/sylius');
             run('yarn encore prod', path: 'apps/sylius');
         },
         'synolia/sylius-scheduler-command-plugin' => function () {
