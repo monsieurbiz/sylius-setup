@@ -17,33 +17,33 @@ function installPlugins(): void
         'monsieurbiz/sylius-admin-better-login-plugin' => function () {},
         // 'monsieurbiz/sylius-advanced-option-plugin' => function () {}, // Compatibility <1.11
         'monsieurbiz/sylius-alert-message-plugin' => function () {
-            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
         'monsieurbiz/sylius-anti-spam-plugin' => function () {
-            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
             // Update Customer Entity - User operation
-            io()->info('Implements the interface `\MonsieurBiz\SyliusAntiSpamPlugin\Entity\QuarantineItemAwareInterface` in your Customer entity.');
+            io()->info('Implement the interface `\MonsieurBiz\SyliusAntiSpamPlugin\Entity\QuarantineItemAwareInterface` in your Customer entity.');
             io()->info('Use the trait `\MonsieurBiz\SyliusAntiSpamPlugin\Entity\QuarantineItemAwareTrait` in your Customer entity.');
-            while (!io()->confirm('Have you changed your Customer entity correctly ?', false));
-            run('symfony console  doctrine:migrations:diff --namespace="App\Migrations" || true', path: 'apps/sylius'); // Generate app migration
-            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run app migrations
+            while (!io()->confirm('Have you updated your Customer entity correctly?', false));
+            run('symfony console doctrine:migrations:diff --namespace="App\Migrations" || true', path: 'apps/sylius'); // Generate app migration
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run app migrations
         },
         'monsieurbiz/sylius-cms-page-plugin' => function () {
-            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
         'monsieurbiz/sylius-coliship-plugin' => function () {
-            run('symfony console  doctrine:migrations:diff --namespace="App\Migrations" || true', path: 'apps/sylius'); // Generate plugin migration - Not in plugin
-            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run generated migration
+            run('symfony console doctrine:migrations:diff --namespace="App\Migrations" || true', path: 'apps/sylius'); // Generate plugin migration - Not in plugin
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run generated migration
         },
         'monsieurbiz/sylius-contact-request-plugin' => function () {
-            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
         'monsieurbiz/sylius-homepage-plugin' => function () {
-            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
         'monsieurbiz/sylius-media-manager-plugin' => function () {},
         'monsieurbiz/sylius-menu-plugin' => function () {
-            run('symfony console doctrine:migrations:migrate', path: 'apps/sylius'); // Run plugin migrations
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
         'monsieurbiz/sylius-no-commerce-plugin' => function () {},
         'monsieurbiz/sylius-order-history-plugin' => function () {},
@@ -68,7 +68,7 @@ function installPlugins(): void
         io()->info('Installing ' . $selectedPlugin . '…');
         run('symfony composer require ' . $selectedPlugin, path: 'apps/sylius');
         $plugins[$selectedPlugin]();
-        io()->info('Installed ' . $selectedPlugin . '…');
+        io()->success('Successful installation of ' . $selectedPlugin);
     }
 
     run('rm -rf apps/sylius/var/cache');
