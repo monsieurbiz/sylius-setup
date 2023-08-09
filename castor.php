@@ -86,7 +86,9 @@ function setup(): void
     run('rm -rf apps/sylius/.github');
 
     # Clean up Sylius
-    run('rm -rf apps/sylius/{Dockerfile}');
+    run('rm -rf apps/sylius/Dockerfile');
+    run('rm -rf apps/sylius/themes/.gitignore');
+    run('rm -rf apps/sylius/src/Entity/.gitignore');
 
     # Fix PHP CS
     run('make test.phpcs.fix', timeout: false);

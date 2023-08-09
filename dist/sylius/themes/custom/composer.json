@@ -1,0 +1,9 @@
+{
+    "name": "monsieurbiz/custom-theme",
+    "extra": {
+        "sylius-theme": {
+            "title": "Custom",
+            "parents": ["monsieurbiz/sylius-tailwind-theme"]
+        }
+    }
+}

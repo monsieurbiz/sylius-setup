@@ -1,0 +1,9 @@
+webpack_encore:
+    builds:
+        custom-theme: '%kernel.project_dir%/public/build/themes/custom'
+
+framework:
+    assets:
+        packages:
+            custom-theme:
+                json_manifest_path: '%kernel.project_dir%/public/build/themes/custom/manifest.json'
