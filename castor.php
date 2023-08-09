@@ -56,6 +56,9 @@ function setup(): void
     run('symfony composer require --dev phpmd/phpmd="*"', path: 'apps/sylius/');
     run('symfony composer require --dev phpunit/phpunit="^9.5" --with-all-dependencies', path: 'apps/sylius/');
     run('symfony composer require --dev friendsofphp/php-cs-fixer', path: 'apps/sylius/');
+    run('symfony composer require cweagans/composer-patches', path: 'apps/sylius/');
+    run('symfony composer config --json extra.patches.szeidler/composer-patches-cli \'{"fix return type": "https://patch-diff.githubusercontent.com/raw/szeidler/composer-patches-cli/pull/32.patch"}\'', path: 'apps/sylius/');
+    run('symfony composer require --dev szeidler/composer-patches-cli', path: 'apps/sylius/');
 
     # Fix for sylius and doctrine conflict
     io()->info('Add conflict for doctrine/orm in order to fix an issue in Sylius.');
