@@ -2,8 +2,9 @@ name: Pipeline
 
 on:
     push:
-        branches: [ develop, master ]
+        branches: [ master ]
     pull_request:
+        branches: [ develop ]
 
 jobs:
 
