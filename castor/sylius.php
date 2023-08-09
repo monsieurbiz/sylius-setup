@@ -56,6 +56,16 @@ function installPlugins(): void
             run('symfony composer patch-add sylius/theme-bundle "Remove performNoDeepMerging to authorise theme folder" "https://patch-diff.githubusercontent.com/raw/Sylius/SyliusThemeBundle/pull/128.patch"', path: 'apps/sylius');
             run('symfony composer install sylius/theme-bundle', path: 'apps/sylius');
         },
+        'monsieurbiz/sylius-tailwind-theme' => function () {
+            run('symfony composer require monsieurbiz/sylius-tailwind-theme', path: 'apps/sylius');
+            io()->info('Add this line into your webpack.config.js file: (at the end, before the module.exports statement)');
+            io()->block("const syliusTailwindThemeConfig = require('./vendor/monsieurbiz/sylius-tailwind-theme/webpack.config');");
+            io()->info('And update the module.exports statement as well by adding the syliusTailwindThemeConfig variable.');
+            while (!io()->confirm('Did you update your webpack.config.js file?', false));
+            run('yarn add daisyui@^2.50.0', path: 'apps/sylius');
+            run('yarn add postcss-loader@^7.0.0 --dev', path: 'apps/sylius');
+            run('yarn encore dev', path: 'apps/sylius');
+        },
         'synolia/sylius-scheduler-command-plugin' => function () {
             io()->info('Update your clevercloud/cron.json by adding this new line:');
             io()->block('"0 0 * * *      $ROOT/clevercloud/symfony_console.sh synolia:scheduler-run",');
