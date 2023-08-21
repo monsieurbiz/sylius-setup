@@ -4,3 +4,4 @@
 
 # To keep
 /.castor.stub.php
+/apps/sylius/public/_themes
