@@ -18,8 +18,8 @@ sylius.fixtures.suite:
 	test -f ${NO_FIXTURES_FILE} || ($(call symfony.console,sylius:fixtures:load -n ${SYLIUS_FIXTURES_SUITE} -v))
 
 sylius.assets: ## Install all assets with symlinks
-	$(call symfony.console,sylius:install:assets)
-	$(call symfony.console,assets:install --symlink --relative)
+	$(call symfony.console,assets:install)
+	$(call symfony.console,sylius:theme:assets:install)
 
 .PHONY: sylius.theming.build
 sylius.theming.build: yarn.install ## Build the themes
