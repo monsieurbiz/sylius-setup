@@ -52,9 +52,7 @@ function installPlugins(): void
         'monsieurbiz/sylius-sales-reports-plugin' => function () {},
         'monsieurbiz/sylius-search-plugin' => function () {},
         'monsieurbiz/sylius-settings-plugin' => function () {},
-        'monsieurbiz/sylius-shipping-slot-plugin' => function () {
-
-        },
+        'monsieurbiz/sylius-shipping-slot-plugin' => function () {},
         'monsieurbiz/sylius-theme-companion-plugin' => function () {
             run('symfony composer patch-add sylius/theme-bundle "Remove performNoDeepMerging to authorise theme folder" "https://patch-diff.githubusercontent.com/raw/Sylius/SyliusThemeBundle/pull/128.patch"', path: 'apps/sylius');
             run('symfony composer update sylius/theme-bundle', path: 'apps/sylius');
