@@ -6,6 +6,7 @@ use Castor\Attribute\AsTask;
 use Castor\GlobalHelper;
 use Symfony\Component\Console\Question\Question;
 
+use function Castor\capture;
 use function Castor\fs;
 use function Castor\io;
 use function Castor\run;
