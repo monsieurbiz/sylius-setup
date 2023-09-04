@@ -1,8 +1,9 @@
 name: WIP
 
 on:
-    pull_request:
+    pull_request_target:
         types: [labeled, unlabeled, opened, edited, synchronize]
+
 jobs:
     WIP:
         runs-on: ubuntu-latest
