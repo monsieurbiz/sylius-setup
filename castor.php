@@ -85,8 +85,8 @@ function setup(): void
     fs()->touch('apps/sylius/src/Resources/config/.gitignore');
 
     # Ignore .php-cs-fixer.cache and _themes in public
-    fs()->appendToFile('apps/sylius/.gitignore', '/.php-cs-fixer.cache');
-    fs()->appendToFile('apps/sylius/.gitignore', '/public/_themes');
+    fs()->appendToFile('apps/sylius/.gitignore', '/.php-cs-fixer.cache' . PHP_EOL);
+    fs()->appendToFile('apps/sylius/.gitignore', '/public/_themes' . PHP_EOL);
 
     # install
     run('make install', timeout: false);
