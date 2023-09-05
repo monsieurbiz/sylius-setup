@@ -52,19 +52,19 @@ function setup(): void
     run('symfony composer config --unset authors', path: 'apps/sylius/');
     run('symfony composer config --unset keywords', path: 'apps/sylius/');
     run('symfony composer config extra.symfony.allow-contrib true', path: 'apps/sylius/');
-    run('symfony composer require php="^' . $phpVersion . '"', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer require --no-scripts php="^' . $phpVersion . '"', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
 
     # Add scripts in composer.json
     run('symfony composer config scripts.phpcs "php-cs-fixer fix --allow-risky=yes"', path: 'apps/sylius/');
     run('symfony composer config scripts.phpmd "phpmd src/,plugins/ ansi phpmd.xml --exclude src/Migrations"', path: 'apps/sylius/');
 
     # Add or update packages
-    run('symfony composer require --dev phpmd/phpmd="*"', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
-    run('symfony composer require --dev phpunit/phpunit="^9.5" --with-all-dependencies', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
-    run('symfony composer require --dev friendsofphp/php-cs-fixer', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
-    run('symfony composer require cweagans/composer-patches', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer require --dev --no-scripts phpmd/phpmd="*"', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer require --dev --no-scripts phpunit/phpunit="^9.5" --with-all-dependencies', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer require --dev --no-scripts friendsofphp/php-cs-fixer', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer require --no-scripts cweagans/composer-patches', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
     run('symfony composer config --json extra.patches.szeidler/composer-patches-cli \'{"fix return type": "https://patch-diff.githubusercontent.com/raw/szeidler/composer-patches-cli/pull/32.patch"}\'', path: 'apps/sylius/');
-    run('symfony composer require --dev szeidler/composer-patches-cli', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
 
     # Fix for sylius and doctrine conflict
     io()->info('Add conflict for doctrine/orm in order to fix an issue in Sylius.');
