@@ -47,13 +47,33 @@ function installPlugins(): void
             run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
         'monsieurbiz/sylius-no-commerce-plugin' => function () {},
-        'monsieurbiz/sylius-order-history-plugin' => function () {},
+        'monsieurbiz/sylius-order-history-plugin' => function () {
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
+        },
         'monsieurbiz/sylius-rich-editor-plugin' => function () {},
         'monsieurbiz/sylius-sales-reports-plugin' => function () {},
-        'monsieurbiz/sylius-search-plugin' => function () {},
+        'monsieurbiz/sylius-search-plugin' => function () {
+            io()->info('Install Elasticseach with analysis-icu and analysis-phonetic plugins, or add it to your docker stack');
+            io()->info('Implement the interface `\MonsieurBiz\SyliusSearchPlugin\Entity\Product\SearchableInterface` in your ProductAttribute and ProductOption entities.');
+            io()->info('Use the trait `\MonsieurBiz\SyliusSearchPlugin\Model\Product\SearchableTrait` in your ProductAttribute and ProductOption entities.');
+            while (!io()->confirm('Have you updated your Customer entity correctly?', false));
+            run('symfony console doctrine:migrations:diff --namespace="App\Migrations" || true', path: 'apps/sylius'); // Generate app migration
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run app migrations
+            io()->info('Run `monsieurbiz:search:populate` symfony command to populate ES and/or add this command in `clevercloud/functions.sh`');
+        },
         'monsieurbiz/sylius-settings-plugin' => function () {},
         'monsieurbiz/sylius-shipping-slot-plugin' => function () {
-
+             // Update Entities - User operation
+             io()->info('Implement the interface `\MonsieurBiz\SyliusShippingSlotPlugin\Entity\OrderInterface` in your Order entity.');
+             io()->info('Use the trait `\MonsieurBiz\SyliusShippingSlotPlugin\Entity\OrderTrait` in your Order entity.');
+             io()->info('Implement the interface `\MonsieurBiz\SyliusShippingSlotPlugin\Entity\ProductVariantInterface` in your ProductVariant entity.');
+             io()->info('Use the trait `\MonsieurBiz\SyliusShippingSlotPlugin\Entity\ProductVariantTrait` in your ProductVariant entity.');
+             io()->info('Implement the interface `\MonsieurBiz\SyliusShippingSlotPlugin\Entity\ShipmentInterface` in your Shipment entity.');
+             io()->info('Use the trait `\MonsieurBiz\SyliusShippingSlotPlugin\Entity\ShipmentTrait` in your Shipment entity.');
+             io()->info('Implement the interface `\MonsieurBiz\SyliusShippingSlotPlugin\Entity\ShippingMethodInterface` in your ShippingMethod entity.');
+             io()->info('Use the trait `\MonsieurBiz\SyliusShippingSlotPlugin\Entity\ShippingMethodTrait` in your ShippingMethod entity.');
+             while (!io()->confirm('Have you updated your entities correctly?', false));
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
         'monsieurbiz/sylius-theme-companion-plugin' => function () {
             run('symfony composer patch-add sylius/theme-bundle "Remove performNoDeepMerging to authorise theme folder" "https://patch-diff.githubusercontent.com/raw/Sylius/SyliusThemeBundle/pull/128.patch"', path: 'apps/sylius');
@@ -61,8 +81,6 @@ function installPlugins(): void
         },
         'monsieurbiz/sylius-tailwind-theme' => function () {
             run('symfony composer require monsieurbiz/sylius-tailwind-theme', path: 'apps/sylius');
-            io()->info('Update the module.exports statement as well by adding the syliusTailwindThemeConfig variable.');
-            while (!io()->confirm('Did you update your webpack.config.js file?', false));
             run('yarn install --force', path: 'apps/sylius');
             run('yarn encore prod', path: 'apps/sylius');
         },
@@ -71,6 +89,16 @@ function installPlugins(): void
             io()->block('"0 0 * * *      $ROOT/clevercloud/symfony_console.sh synolia:scheduler-run",');
             while (!io()->confirm('Have you updated your cron.json?', false));
             run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
+        },
+        'stefandoorn/sitemap-plugin' => function () {
+            io()->info('Follow the installation guide: https://github.com/stefandoorn/sitemap-plugin#installation');
+            io()->info('Update your clevercloud/cron.json by adding this new line:');
+            io()->block('"0 2 * * *      $ROOT/clevercloud/symfony_console.sh sylius:sitemap:generate",');
+            while (!io()->confirm('Did you follow the installation guide and updated your cron.json?', false));
+        },
+        'synolia/sylius-gdpr-plugin' => function () {
+            io()->info('Follow the installation guide: https://github.com/synolia/SyliusGDPRPlugin#installation');
+            while (!io()->confirm('Did you follow the installation guide?', false));
         },
     ];
 
@@ -86,7 +114,7 @@ function installPlugins(): void
 
     foreach ($selectedPlugins as $selectedPlugin) {
         io()->info('Installing ' . $selectedPlugin . '…');
-        run('symfony composer require ' . $selectedPlugin, path: 'apps/sylius');
+        run('symfony composer require ' . $selectedPlugin, path: 'apps/sylius', timeout: 120);
         $plugins[$selectedPlugin]();
         io()->success('Successful installation of ' . $selectedPlugin);
     }

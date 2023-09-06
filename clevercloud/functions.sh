@@ -28,7 +28,9 @@ export -f protect_application
 
 function build_sylius() {
   cd ${APP_HOME}/apps/sylius
+  php ./bin/console sylius:install:assets -v
   php ./bin/console doctrine:migr:migr -n -v
+  php ./bin/console messenger:setup-transports -n -v
 }
 export -f build_sylius
 
