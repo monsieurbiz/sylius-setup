@@ -156,6 +156,7 @@ function setupEnv(object $project): string
     $setEnv('APP_ENV', $project->env);
     $setEnv('APP_DEBUG', '0');
     $setEnv('DATABASE_URL', $databaseUri);
+    $setEnv('ENABLE_APCU', 'true');
     $setEnv('MAINTENANCE', 'false');
     $setEnv('IS_PROTECTED', 'true');
     $setEnv('APP_SECRET', md5(random_bytes(32)));
