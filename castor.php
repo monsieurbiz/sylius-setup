@@ -88,6 +88,9 @@ function setup(): void
     fs()->appendToFile('apps/sylius/.gitignore', '/.php-cs-fixer.cache' . PHP_EOL);
     fs()->appendToFile('apps/sylius/.gitignore', '/public/_themes' . PHP_EOL);
 
+    # We want to commit the composer.lock
+    run('sed -i "" -e "/composer.lock/d" .gitignore', path: 'apps/sylius/');
+
     # install
     run('make install', timeout: false);
 
