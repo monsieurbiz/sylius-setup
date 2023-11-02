@@ -72,6 +72,10 @@ jobs:
                         ${{ runner.os }}-node-build-${{ env.cache-name }}-
                         ${{ runner.os }}-node-build-
 
+            -   uses: symfonycorp/security-checker-action@v4
+                with:
+                    lock: apps/sylius/composer.lock
+
             -   run: make install
 
             -   run: make test.composer
