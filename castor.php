@@ -81,7 +81,7 @@ function setup(
     run('symfony composer update', path: 'apps/sylius/', timeout: false);
 
     # Copy dist files
-    run('cp -Rv dist/sylius/* apps/sylius/');
+    run('cp -Rv dist/sylius/ apps/sylius'); // We have hidden files in dist/sylius
     run('rm -rf dist');
 
     # Add missing directories

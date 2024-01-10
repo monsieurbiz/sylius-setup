@@ -36,7 +36,7 @@ return $config->setRules([
         'syntax' => 'short',
     ],
     'comment_to_phpdoc' => true,
-    'compact_nullable_typehint' => true,
+    'compact_nullable_type_declaration' => true,
     'concat_space' => [
         'spacing' => 'one',
     ],
