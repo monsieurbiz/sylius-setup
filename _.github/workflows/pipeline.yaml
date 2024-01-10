@@ -122,11 +122,11 @@ jobs:
         runs-on: ubuntu-latest
 
         concurrency:
-            group: production
+            group: production-deployment
             cancel-in-progress: true
 
         environment:
-            name: production
+            name: prod
             url: ${{ vars.PRODUCTION_URL }}
 
         env:
