@@ -10,8 +10,7 @@ use function Castor\get_output;
 use function Castor\io;
 use function Castor\run;
 
-#[AsTask(name: 'plugins', namespace: 'sylius', description: 'Install Sylius plugins locally')]
-function installPlugins(): void
+function getPlugins(): array
 {
     $plugins = [
         'monsieurbiz/sylius-admin-better-login-plugin' => function () {},
@@ -102,6 +101,27 @@ function installPlugins(): void
         },
     ];
     ksort($plugins);
+
+    return $plugins;
+}
+
+#[AsTask(name: 'plugins:list', namespace: 'sylius', description: 'List Sylius plugins')]
+function listPlugins(): void
+{
+    $plugins = getPlugins();
+
+    $rows = [];
+    foreach ($plugins as $pluginIdentifier => $callback) {
+        $rows[] = [$pluginIdentifier];
+    }
+
+    io()->table(['Plugin\'s composer identifier'], $rows);
+}
+
+#[AsTask(name: 'plugins:install', namespace: 'sylius', description: 'Install Sylius plugins locally')]
+function installPlugins(): void
+{
+    $plugins = getPlugins();
 
     $question = new ChoiceQuestion(
         'Please select the plugins you want to install',
