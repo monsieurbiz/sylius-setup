@@ -101,6 +101,7 @@ function installPlugins(): void
             while (!io()->confirm('Did you follow the installation guide?', false));
         },
     ];
+    ksort($plugins);
 
     $question = new ChoiceQuestion(
         'Please select the plugins you want to install',

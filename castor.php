@@ -65,6 +65,15 @@ function setup(
     run('symfony composer config scripts.phpcs "php-cs-fixer fix --allow-risky=yes"', path: 'apps/sylius/');
     run('symfony composer config scripts.phpmd "phpmd src/,plugins/ ansi phpmd.xml --exclude src/Migrations"', path: 'apps/sylius/');
 
+    # Allow plugins
+    run('symfony composer config allow-plugins.symfony/flex true', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer config allow-plugins.phpstan/extension-installer true', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer config allow-plugins.symfony/thanks true', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer config allow-plugins.symfony/runtime true', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer config allow-plugins.cweagans/composer-patches true', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+    run('symfony composer config allow-plugins.szeidler/composer-patches-cli true', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
+
     # Add or update packages
     run('symfony composer require --dev --no-scripts phpmd/phpmd="*"', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
     run('symfony composer require --dev --no-scripts phpunit/phpunit="^9.5" --with-all-dependencies', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
