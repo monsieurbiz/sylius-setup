@@ -2,6 +2,7 @@
 
 namespace MonsieurBiz\SyliusSetup\Castor;
 
+use Castor\Attribute\AsOption;
 use Castor\Attribute\AsTask;
 use Castor\GlobalHelper;
 use Symfony\Component\Console\Question\Question;
@@ -12,6 +13,8 @@ use function Castor\io;
 use function Castor\run;
 
 const DEFAULT_TIMEOUT_COMPOSER_PROCESS = 120;
+const SUGGESTED_PHP_VERSION = '8.2';
+const SUGGESTED_SYLIUS_VERSION = '1.12';
 
 #[AsTask(namespace: 'local', description: 'Reset local project. Be careful!')]
 function reset(): void
@@ -24,10 +27,12 @@ function reset(): void
 }
 
 #[AsTask(namespace: 'local', description: 'Init project')]
-function setup(): void
-{
+function setup(
+    #[AsOption(description: 'PHP Version', suggestedValues: [SUGGESTED_PHP_VERSION])] ?string $php = null,
+    #[AsOption(description: 'Sylius major version', suggestedValues: [SUGGESTED_SYLIUS_VERSION])] ?string $sylius = null,
+): void {
     # PHP Version
-    $phpVersion = io()->ask('Which PHP do you want?', '8.2');
+    $phpVersion = $php ?? io()->ask('Which PHP do you want?', SUGGESTED_PHP_VERSION);
     file_put_contents('.php-version', $phpVersion);
 
     # .gitignore
@@ -37,7 +42,8 @@ function setup(): void
     }
 
     # sylius
-    run('symfony composer create-project --no-scripts sylius/sylius-standard apps/sylius', timeout: false);
+    $syliusVersion = $sylius ?? io()->ask('Which Sylius version do you want?', SUGGESTED_SYLIUS_VERSION);
+    run('symfony composer create-project --no-scripts sylius/sylius-standard=^' . $syliusVersion . '.0 apps/sylius', timeout: false);
     file_put_contents('apps/sylius/.env.dev', 'MAILER_DSN=smtp://localhost:1025');
     file_put_contents('apps/sylius/.php-version', $phpVersion);
 
