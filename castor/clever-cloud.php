@@ -186,7 +186,7 @@ function setupEnv(object $project): string
     $setEnv('APP_JPEGOPTIM_BINARY', '/usr/host/bin/jpegoptim');
     $setEnv('APP_PNGQUANT_BINARY', '/usr/host/bin/pngquant');
     $setEnv('WKHTMLTOIMAGE_PATH', '/usr/host/bin/wkhtmltoimage');
-    $setEnv('WKTHMLTOPDF_PATH', '/usr/host/bin/wkhtmltopdf');
+    $setEnv('WKHTMLTOPDF_PATH', '/usr/host/bin/wkhtmltopdf');
 
     return $hostname;
 }
