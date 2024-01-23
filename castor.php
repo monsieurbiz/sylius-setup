@@ -79,7 +79,6 @@ function setup(
     run('symfony composer require --dev --no-scripts phpunit/phpunit="^9.5" --with-all-dependencies', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
     run('symfony composer require --dev --no-scripts friendsofphp/php-cs-fixer', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
     run('symfony composer require --no-scripts cweagans/composer-patches', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
-    run('symfony composer config --json extra.patches.szeidler/composer-patches-cli \'{"fix return type": "https://patch-diff.githubusercontent.com/raw/szeidler/composer-patches-cli/pull/32.patch"}\'', path: 'apps/sylius/');
     run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', path: 'apps/sylius/', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS);
 
     # Fix for sylius and doctrine conflict
