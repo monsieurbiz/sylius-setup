@@ -99,6 +99,20 @@ function getPlugins(): array
             io()->info('Follow the installation guide: https://github.com/synolia/SyliusGDPRPlugin#installation');
             while (!io()->confirm('Did you follow the installation guide?', false));
         },
+        'sylius/admin-order-creation-plugin' => function () {
+            io()->info('Follow the installation guide: https://github.com/Sylius/AdminOrderCreationPlugin#installation');
+            while (!io()->confirm('Did you follow the installation guide?', false));
+        },
+        'sylius/invoicing-plugin' => function () {
+            io()->info('Follow the installation guide: https://github.com/Sylius/InvoicingPlugin?tab=readme-ov-file#installation');
+            while (!io()->confirm('Did you follow the installation guide?', false));
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
+        },
+        'sylius/refund-plugin' => function () {
+            io()->info('Follow the installation guide: https://github.com/Sylius/RefundPlugin?tab=readme-ov-file#installation');
+            while (!io()->confirm('Did you follow the installation guide?', false));
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
+        },
     ];
     ksort($plugins);
 
