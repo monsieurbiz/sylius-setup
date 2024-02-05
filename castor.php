@@ -52,7 +52,7 @@ function setup(
     if ($repo === 'no git remotes found') {
         $repo = "monsieurbiz/project";
     }
-    run('symfony composer config name "' . $repo . '"', path: 'apps/sylius/');
+    run('symfony composer config name "' . strtolower($repo) . '"', path: 'apps/sylius/');
     run('symfony composer config description "' . $repo . '"', path: 'apps/sylius/');
     run('symfony composer config license proprietary', path: 'apps/sylius/');
     run('symfony composer config --unset homepage', path: 'apps/sylius/');
