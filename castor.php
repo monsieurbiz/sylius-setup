@@ -48,7 +48,7 @@ function setup(
     file_put_contents('apps/sylius/.php-version', $phpVersion);
 
     # Cleanup the composer.json
-    $repo = capture('gh repo view --json nameWithOwner --jq .nameWithOwner | cat');
+    $repo = strtolower(capture('gh repo view --json nameWithOwner --jq .nameWithOwner | cat'));
     if ($repo === 'no git remotes found') {
         $repo = "monsieurbiz/project";
     }
@@ -103,8 +103,8 @@ function setup(
     fs()->appendToFile('apps/sylius/.gitignore', '/public/_themes' . PHP_EOL);
 
     # We want to commit the composer.lock and yarn.lock
-    run('sed -i "" -e "/composer.lock/d" .gitignore', path: 'apps/sylius/');
-    run('sed -i "" -e "/yarn.lock/d" .gitignore', path: 'apps/sylius/');
+    run('sed -i "" -e "/composer.lock/d" .gitignore', path: 'apps/sylius/', allowFailure: true);
+    run('sed -i "" -e "/yarn.lock/d" .gitignore', path: 'apps/sylius/', allowFailure: true);
 
     # install
     run('make install', timeout: false);
