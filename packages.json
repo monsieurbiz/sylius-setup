@@ -5,8 +5,8 @@
                 "name": "sylius/sylius-standard",
                 "version": "2.0-dev",
                 "dist": {
-                    "url": "../Sylius-Standard",
-                    "type": "path"
+                    "url": "https://github.com/maximehuran/Sylius-Standard/archive/refs/heads/2.0-dev.zip",
+                    "type": "zip"
                 }
              }
         }
