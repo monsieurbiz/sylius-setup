@@ -1,0 +1,14 @@
+{
+    "packages": {
+        "sylius/sylius-standard": {
+            "2.0-dev": { 
+                "name": "sylius/sylius-standard",
+                "version": "2.0-dev",
+                "dist": {
+                    "url": "../Sylius-Standard",
+                    "type": "path"
+                }
+             }
+        }
+    }
+}
