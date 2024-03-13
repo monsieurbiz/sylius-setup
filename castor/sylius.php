@@ -45,7 +45,14 @@ function getPlugins(): array
         'monsieurbiz/sylius-menu-plugin' => function () {
             run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
-        'monsieurbiz/sylius-no-commerce-plugin' => function () {},
+        'monsieurbiz/sylius-no-commerce-plugin' => function () {
+            io()->info('Add the `AssociationOverrides` in `Channel` entity.');
+            while (!io()->confirm('Have you updated your Channel entity correctly?', false));
+            io()->info('Change `MicroKernelTrait` to `SyliusNoCommerceKernelTrait` in `Kernel.php`.');
+            while (!io()->confirm('Have you updated your Kernel correctly?', false));
+            run('cp -Rv vendor/monsieurbiz/sylius-no-commerce-plugin/src/Resources/templates/* templates/', path: 'apps/sylius');
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
+        },
         'monsieurbiz/sylius-order-history-plugin' => function () {
             run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
@@ -60,7 +67,9 @@ function getPlugins(): array
             run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run app migrations
             io()->info('Run `monsieurbiz:search:populate` symfony command to populate ES and/or add this command in `clevercloud/functions.sh`');
         },
-        'monsieurbiz/sylius-settings-plugin' => function () {},
+        'monsieurbiz/sylius-settings-plugin' => function () {
+            run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
+        },
         'monsieurbiz/sylius-shipping-slot-plugin' => function () {
              // Update Entities - User operation
              io()->info('Implement the interface `\MonsieurBiz\SyliusShippingSlotPlugin\Entity\OrderInterface` in your Order entity.');
