@@ -14,7 +14,7 @@ use function Castor\run;
 
 const DEFAULT_TIMEOUT_COMPOSER_PROCESS = 120;
 const SUGGESTED_PHP_VERSION = '8.2';
-const SUGGESTED_SYLIUS_VERSION = '1.12';
+const SUGGESTED_SYLIUS_VERSION = '2.0-dev';
 
 #[AsTask(namespace: 'local', description: 'Reset local project. Be careful!')]
 function reset(): void
@@ -43,7 +43,7 @@ function setup(
 
     # sylius
     $syliusVersion = $sylius ?? io()->ask('Which Sylius version do you want?', SUGGESTED_SYLIUS_VERSION);
-    run('symfony composer create-project --no-scripts sylius/sylius-standard=^' . $syliusVersion . '.0 apps/sylius', timeout: false);
+    run('symfony composer create-project --repository packages.json --no-scripts sylius/sylius-standard=^' . $syliusVersion . ' apps/sylius', timeout: false);
     file_put_contents('apps/sylius/.env.dev', 'MAILER_DSN=smtp://localhost:1025');
     file_put_contents('apps/sylius/.php-version', $phpVersion);
 
