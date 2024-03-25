@@ -27,6 +27,7 @@ function getPlugins(): array
             run('symfony console doctrine:migrations:diff --namespace="App\Migrations" || true', path: 'apps/sylius'); // Generate app migration
             run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run app migrations
         },
+        'monsieurbiz/sylius-better-admin-plugin' => function () {},
         'monsieurbiz/sylius-cms-page-plugin' => function () {
             run('symfony console doctrine:migrations:migrate -n', path: 'apps/sylius'); // Run plugin migrations
         },
