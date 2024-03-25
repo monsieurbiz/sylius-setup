@@ -102,8 +102,8 @@ function initGithubEnv(
         $deployBranch
     ));
 
-    run('gh secret set -e ' . $environment . ' CLEVER_TOKEN -b ' . ($token) ?? io()->ask('CLEVER_TOKEN?'));
-    run('gh secret set -e ' . $environment . ' CLEVER_SECRET -b ' . ($secret) ?? io()->ask('CLEVER_SECRET?'));
+    run('gh secret set -e ' . $environment . ' CLEVER_TOKEN -b ' . ($token ?? io()->ask('CLEVER_TOKEN?')));
+    run('gh secret set -e ' . $environment . ' CLEVER_SECRET -b ' . ($secret ?? io()->ask('CLEVER_SECRET?')));
 
     if (null !== $branch || null !== $url || true === $setupEnvs || io()->confirm('Would you like to setup the repository variables?', false)) {
         initGithubVariables($environment, $branch, $url);
