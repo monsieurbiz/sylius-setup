@@ -30,7 +30,8 @@ Simply run: `castor github:env:setup` and follow the instructions.
 
 ## Install Sylius plugins
 
-After installing Sylius, you can install the plugins you need: `castor sylius:plugins:install`.
+After installing Sylius, you can install the plugins you need: `castor sylius:plugins:install`.  
+Use the `--plugins` option to specify the plugins you want to install: `castor sylius:plugins:install --plugins=monsieurbiz/sylius-homepage-plugin --plugins=monsieurbiz/sylius-cms-page-plugin`.
 
 You can find the list of all plugins available using `castor sylius:plugins:list`.
 

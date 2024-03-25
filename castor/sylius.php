@@ -2,11 +2,10 @@
 
 namespace MonsieurBiz\SyliusSetup\Castor\Sylius;
 
+use Castor\Attribute\AsOption;
 use Castor\Attribute\AsTask;
-
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use function Castor\get_application;
-use function Castor\get_output;
 use function Castor\io;
 use function Castor\run;
 
@@ -143,9 +142,11 @@ function listPlugins(): void
 }
 
 #[AsTask(name: 'plugins:install', namespace: 'sylius', description: 'Install Sylius plugins locally')]
-function installPlugins(): void
-{
+function installPlugins(
+    #[AsOption(name: 'plugins', mode: InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, description: 'List of plugins to install')] array $selectedPlugins = []
+): void {
     $plugins = getPlugins();
+    $selectedPlugins = array_filter($selectedPlugins, fn ($plugin) => array_key_exists($plugin, $plugins));
 
     $question = new ChoiceQuestion(
         'Please select the plugins you want to install',
@@ -153,7 +154,7 @@ function installPlugins(): void
     );
     $question->setMultiselect(true);
 
-    $selectedPlugins = io()->askQuestion($question);
+    $selectedPlugins = $selectedPlugins ?: io()->askQuestion($question);
 
     run('symfony composer config --no-plugins --json extra.symfony.endpoint \'["https://api.github.com/repos/Sylius/SyliusRecipes/contents/index.json?ref=flex/main","https://api.github.com/repos/monsieurbiz/symfony-recipes/contents/index.json?ref=flex/master","flex://defaults"]\'', path: 'apps/sylius');
 
