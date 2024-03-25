@@ -181,6 +181,9 @@ function setupEnv(object $project): string
     $setEnv('IS_PROTECTED', 'true');
     $setEnv('APP_SECRET', md5(random_bytes(32)));
     $setEnv('HTTPS', 'on');
+    $setEnv('HTTP_AUTH_CLEAR', 'false');
+    $setEnv('HTTP_AUTH_USERNAME', '');
+    $setEnv('HTTP_AUTH_PASSWORD', '');
     $setEnv('MEMORY_LIMIT', '256M');
     $setEnv('SYLIUS_FIXTURES_HOSTNAME', $hostname);
     $setEnv('APP_JPEGOPTIM_BINARY', '/usr/host/bin/jpegoptim');
