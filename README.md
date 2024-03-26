@@ -16,6 +16,19 @@ Then you can :
 - Remove the `composer.lock` line in `apps/sylius/.gitignore` if you want to commit it.
 - And code!
 
+## Setup Github Repository
+
+Simply run: `castor github:project:init`
+
+This command will configure the repository:
+
+- Add autolink
+- Change default branch and create protections
+- Allow auto merge and automatically delete branch
+- Add team permissions
+
+See help, with `-h`, to display all command options.
+
 ## Setup Clever Cloud environment
 
 Simply run: `castor clevercloud:setup` and follow the instructions.
