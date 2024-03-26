@@ -23,7 +23,7 @@ function protect_application() {
   if [ "${IS_PROTECTED}" == "true" ]; then
     echo -e "$(cat ${APP_HOME}/clevercloud/security_htaccess)\n\n$(cat ${APP_HOME}${CC_WEBROOT}/.htaccess)" >${APP_HOME}${CC_WEBROOT}/.htaccess
     if [ -n "${HTTP_AUTH_USERNAME:-}" ] && [ -n "${HTTP_AUTH_PASSWORD:-}" ]; then
-      if [ "${HTTP_AUTH_CLEAR:-false}" == "true" ];
+      if [ "${HTTP_AUTH_CLEAR:-false}" == "true" ]; then
         echo "" > ${APP_HOME}/clevercloud/.htpasswd
       fi
       htpasswd -b ${APP_HOME}/clevercloud/.htpasswd ${HTTP_AUTH_USERNAME} ${HTTP_AUTH_PASSWORD}
