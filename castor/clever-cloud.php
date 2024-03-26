@@ -151,7 +151,7 @@ function setupEnv(object $project): string
 {
     $setEnv = function ($name, $value) use ($project): void {
         run(sprintf(
-            'clever env -a %1$s set %2$s %3$s',
+            'clever env -a %1$s set %2$s "%3$s"',
             $project->env,
             $name,
             $value
@@ -170,7 +170,7 @@ function setupEnv(object $project): string
     $setEnv('CC_PRE_RUN_HOOK', './clevercloud/pre_run_hook.sh');
     $setEnv('CC_RUN_SUCCEEDED_HOOK', './clevercloud/run_succeeded_hook.sh');
     $setEnv('CC_TROUBLESHOOT', 'true');
-    $setEnv('CC_WORKER_COMMAND_1', '"clevercloud/symfony_console.sh messenger:consume main --time-limit=300 --failure-limit=1 --memory-limit=512M --sleep=5"');
+    $setEnv('CC_WORKER_COMMAND_1', 'clevercloud/symfony_console.sh messenger:consume main --time-limit=300 --failure-limit=1 --memory-limit=512M --sleep=5');
     $setEnv('CC_WORKER_RESTART', 'always');
     $setEnv('CC_WORKER_RESTART_DELAY', '5');
     $setEnv('APP_ENV', $project->env);
