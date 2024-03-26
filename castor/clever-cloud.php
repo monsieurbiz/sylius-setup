@@ -19,10 +19,11 @@ function cleverSetup(
     #[AsOption(description: 'MySQL plan')] ?string $mysql = null,
     #[AsOption(description: 'Htpasswd username')] ?string $username = null,
     #[AsOption(description: 'Htpasswd password')] ?string $password = null,
+    #[AsOption(description: 'Hostname (use %s to use project ID: {code}-{env})')] string $hostname = '%s.cleverapps.io',
 ): void {
     cleverIsRequired();
 
-    $project = initProject($code, $name, $org, $env);
+    $project = initProject($code, $name, $org, $env, $hostname);
     setupPHP($project, $php);
     setupMySQL($project, $mysql);
     setupFSBucket($project);
@@ -36,7 +37,7 @@ function cleverSetup(
     io()->success('Your project is ready!');
 }
 
-function initProject(string $type, ?string $name = null, ?string $org = null, ?string $env = null): object
+function initProject(string $type, ?string $name = null, ?string $org = null, ?string $env = null, ?string $hostname = '%s.cleverapps.io'): object
 {
     $project = new class {
         public string $name;
@@ -49,7 +50,7 @@ function initProject(string $type, ?string $name = null, ?string $org = null, ?s
     $project->org = $org ?? io()->ask('What is the organization ID from Clever cloud (its name or its code starting with org_)?');
     $project->env = $env ?? io()->askQuestion(new ChoiceQuestion('Which environment?', ['staging', 'prod'], 'prod'));
     $project->id = sprintf('%s-%s', $type, $project->env);
-    $project->hostname = sprintf('%s.cleverapps.io', $project->id);
+    $project->hostname = sprintf($hostname, $project->id);
 
     return $project;
 }
