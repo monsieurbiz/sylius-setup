@@ -12,6 +12,63 @@ use function Castor\run;
 
 const SUGGESTED_ENVS = ['staging', 'prod'];
 
+#[AsTask(name: 'init', namespace: 'github:project', description: 'Init project configuration')]
+function initGithubProjectConfig(
+    #[AsOption(description: 'Default branch name')] ?string $defaultBranch = 'develop',
+    #[AsOption(description: 'PHP Version', suggestedValues: [SUGGESTED_PHP_VERSION])] ?string $php = null,
+    #[AsOption(description: 'Approving review count')] int $approvingReviewCount = 1,
+    #[AsOption(description: 'Autolink prefix, example: TICKET-')] ?string $autoLinkPrefix = null,
+    #[AsOption(description: 'Autolink url template, example: https://example.com/issues/<num>')] ?string $autoLinkUrlTemplate = null,
+): void
+{
+    // Try to read the `.php-version` file
+    if (!$php && file_exists('.php-version')) {
+        $php = trim(file_get_contents('.php-version'));
+    }
+    // Ask for PHP version if not provided
+    $phpVersion = $php ?? io()->ask('Which PHP do you want?', SUGGESTED_PHP_VERSION);
+
+    // Github details for API calls
+    $ghToken = trim(capture('gh auth token', allowFailure: false));
+    $ghRepo = trim(capture('gh repo view --json nameWithOwner --jq .nameWithOwner | cat', allowFailure: false));
+
+    // Check if autolink reference exists and create it if not
+    if ($autoLinkPrefix && $autoLinkUrlTemplate) {
+        $autolink = capture(sprintf('gh api /repos/%s/autolinks --jq \'.[] | select(.key_prefix=="%s") | .id\'', $ghRepo, $autoLinkPrefix), allowFailure: true);
+        if (!$autolink) {
+            run(sprintf('gh api --silent --method POST -f key_prefix="%s" -f url_template="%s" -F is_alphanumeric=true "/repos/%s/autolinks"', $autoLinkPrefix, $autoLinkUrlTemplate, $ghRepo));
+        }
+    }
+
+    // Create "develop" branch, push it and change default branch to "develop"
+    run(sprintf('git checkout -b %s', $defaultBranch), allowFailure: true, quiet: true); // Allow failure in case the branch already exists
+    run(sprintf('git push -u origin %s', $defaultBranch), quiet: true);
+    $ghDefaultBranch = capture(sprintf('gh api --method PATCH -f default_branch=%s "/repos/%s" --jq .default_branch', $defaultBranch, $ghRepo));
+    if ($ghDefaultBranch !== $defaultBranch) {
+        io()->error('Default branch not updated!');
+        return;
+    }
+
+    // Protect "develop" branch
+    $command = <<<CMD
+    curl --silent -L \
+        curl -L \
+        -X PUT \
+        -H "Accept: application/vnd.github+json" \
+        -H "Authorization: Bearer $ghToken" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        https://api.github.com/repos/$ghRepo/branches/$defaultBranch/protection \
+        -d '{"required_status_checks":{"strict":true,"contexts":["Tests (PHP $phpVersion)"]}, "enforce_admins": null, "required_pull_request_reviews": {"required_approving_review_count":$approvingReviewCount}, "restrictions": null,"required_conversation_resolution":true}'
+    CMD;
+    run($command, quiet: true);
+    run(sprintf('gh api --silent --method POST "/repos/%s/branches/%s/protection/required_signatures"', $ghRepo, $defaultBranch));
+
+    // Allow "Auto-merge" and "Automatically delete head branches"
+    run(sprintf('gh api --silent --method PATCH -f allow_auto_merge=true -f delete_branch_on_merge=true "/repos/%s"', $ghRepo));
+
+    io()->success('Project configuration done!');
+}
+
 #[AsTask(name: 'init', namespace: 'github:env', description: 'Init environment (and variables if needed)')]
 function initGithubEnv(
     #[AsOption(description: 'Kind of environment', suggestedValues: SUGGESTED_ENVS)] ?string $environment = null,
@@ -45,8 +102,8 @@ function initGithubEnv(
         $deployBranch
     ));
 
-    run('gh secret set -e ' . $environment . ' CLEVER_TOKEN -b ' . ($token) ?? io()->ask('CLEVER_TOKEN?'));
-    run('gh secret set -e ' . $environment . ' CLEVER_SECRET -b ' . ($secret) ?? io()->ask('CLEVER_SECRET?'));
+    run('gh secret set -e ' . $environment . ' CLEVER_TOKEN -b ' . ($token ?? io()->ask('CLEVER_TOKEN?')));
+    run('gh secret set -e ' . $environment . ' CLEVER_SECRET -b ' . ($secret ?? io()->ask('CLEVER_SECRET?')));
 
     if (null !== $branch || null !== $url || true === $setupEnvs || io()->confirm('Would you like to setup the repository variables?', false)) {
         initGithubVariables($environment, $branch, $url);
