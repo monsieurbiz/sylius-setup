@@ -72,10 +72,10 @@ symfony.server.log: ## Tail the logs
 symfony.migration.generate: ## Generate migration file
 	$(call symfony.console, doctrine:migrations:diff --namespace="App\Migrations")
 
-symfony.migration.execute: ## Excecute migration file
+symfony.migration.execute: ## Execute migration file
 	$(call symfony.console, doctrine:migrations:execute ${ARGS})
 
-symfony.migration.migrate: ## Excecute migration file
+symfony.migration.migrate: ## Execute migration file
 	$(call symfony.console, doctrine:migrations:migrate)
 
 symfony.messenger.setup: ## Setup the messenger transports (create messenger_message table)

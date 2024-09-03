@@ -16,7 +16,7 @@ Then you can :
 - Remove the `composer.lock` line in `apps/sylius/.gitignore` if you want to commit it.
 - And code!
 
-## Setup Github Repository
+## Setup GitHub Repository
 
 Simply run: `castor github:project:init`
 
@@ -35,7 +35,7 @@ Simply run: `castor clevercloud:setup` and follow the instructions.
 
 Add a password for the HTTP auth using the `htpasswd` utility into `clevercloud/.htpasswd` file.
 
-## Setup Github Environment
+## Setup GitHub Environment
 
 You'll need your credentials for Clever Cloud : `clever login` will help you get the required token and secret.
 
@@ -56,7 +56,7 @@ You can find some themes in [themes-examples/](themes-examples/themes/) and foll
 
 ### Which version of Sylius am I installing?
 
-By default the `composer create-project` checks the platform you are working on.  
+By default, the `composer create-project` checks the platform you are working on.  
 We use `symfony` as a wrapper for PHP, this way you can change your PHP version in the `.php-version` file.  
 According to this composer will install the best version compatible with your computer.
 
