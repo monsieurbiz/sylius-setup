@@ -4,6 +4,7 @@ namespace MonsieurBiz\SyliusSetup\Castor;
 
 use Castor\Attribute\AsOption;
 use Castor\Attribute\AsTask;
+use Castor\Context;
 
 use function Castor\capture;
 use function Castor\fs;
@@ -42,9 +43,16 @@ function setup(
         file_put_contents('.gitignore', $ignore[1]);
     }
 
+    # Some contexts
+    $noTimeoutContext = new Context(timeout: false);
+    $composerContext = new Context(
+        workingDirectory: 'apps/sylius/',
+        timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS,
+    );
+
     # sylius
     $syliusVersion = $sylius ?? io()->ask('Which Sylius version do you want?', SUGGESTED_SYLIUS_VERSION);
-    run('symfony composer create-project --no-scripts sylius/sylius-standard=^' . $syliusVersion . '.0 apps/sylius', timeout: false);
+    run('symfony composer create-project --no-scripts sylius/sylius-standard=^' . $syliusVersion . '.0 apps/sylius', context: $noTimeoutContext);
     file_put_contents('apps/sylius/.env.dev', 'MAILER_DSN=smtp://localhost:1025');
     file_put_contents('apps/sylius/.php-version', $phpVersion);
 
@@ -53,41 +61,41 @@ function setup(
     if ($repo === 'no git remotes found') {
         $repo = "monsieurbiz/project";
     }
-    run('symfony composer config name "' . $repo . '"', path: 'apps/sylius/');
-    run('symfony composer config description "' . $repo . '"', path: 'apps/sylius/');
-    run('symfony composer config license proprietary', path: 'apps/sylius/');
-    run('symfony composer config --unset homepage', path: 'apps/sylius/');
-    run('symfony composer config --unset authors', path: 'apps/sylius/');
-    run('symfony composer config --unset keywords', path: 'apps/sylius/');
-    run('symfony composer config extra.symfony.allow-contrib true', path: 'apps/sylius/');
-    run('symfony composer require --no-scripts php="^' . $phpVersion . '"', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
+    run('symfony composer config name "' . $repo . '"', context: $composerContext);
+    run('symfony composer config description "' . $repo . '"', context: $composerContext);
+    run('symfony composer config license proprietary', context: $composerContext);
+    run('symfony composer config --unset homepage', context: $composerContext);
+    run('symfony composer config --unset authors', context: $composerContext);
+    run('symfony composer config --unset keywords', context: $composerContext);
+    run('symfony composer config extra.symfony.allow-contrib true', context: $composerContext);
+    run('symfony composer require --no-scripts php="^' . $phpVersion . '"', context: $composerContext);
 
     # Add scripts in composer.json
-    run('symfony composer config scripts.phpcs "php-cs-fixer fix --allow-risky=yes"', path: 'apps/sylius/');
-    run('symfony composer config scripts.phpmd "phpmd src/,plugins/ ansi phpmd.xml --exclude src/Migrations"', path: 'apps/sylius/');
+    run('symfony composer config scripts.phpcs "php-cs-fixer fix --allow-risky=yes"', context: $composerContext);
+    run('symfony composer config scripts.phpmd "phpmd src/,plugins/ ansi phpmd.xml --exclude src/Migrations"', context: $composerContext);
 
     # Allow plugins
-    run('symfony composer config allow-plugins.symfony/flex true', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
-    run('symfony composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
-    run('symfony composer config allow-plugins.phpstan/extension-installer true', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
-    run('symfony composer config allow-plugins.symfony/thanks true', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
-    run('symfony composer config allow-plugins.symfony/runtime true', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
-    run('symfony composer config allow-plugins.cweagans/composer-patches true', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
-    run('symfony composer config allow-plugins.szeidler/composer-patches-cli true', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
+    run('symfony composer config allow-plugins.symfony/flex true', context: $composerContext);
+    run('symfony composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true', context: $composerContext);
+    run('symfony composer config allow-plugins.phpstan/extension-installer true', context: $composerContext);
+    run('symfony composer config allow-plugins.symfony/thanks true', context: $composerContext);
+    run('symfony composer config allow-plugins.symfony/runtime true', context: $composerContext);
+    run('symfony composer config allow-plugins.cweagans/composer-patches true', context: $composerContext);
+    run('symfony composer config allow-plugins.szeidler/composer-patches-cli true', context: $composerContext);
 
     # Add or update packages
-    run('symfony composer require --dev --no-scripts phpmd/phpmd="*"', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
-    run('symfony composer require --dev --no-scripts phpunit/phpunit="^9.5" --with-all-dependencies', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
-    run('symfony composer require --dev --no-scripts friendsofphp/php-cs-fixer', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
-    run('symfony composer require --no-scripts cweagans/composer-patches', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
-    run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', timeout: DEFAULT_TIMEOUT_COMPOSER_PROCESS, path: 'apps/sylius/');
+    run('symfony composer require --dev --no-scripts phpmd/phpmd="*"', context: $composerContext);
+    run('symfony composer require --dev --no-scripts phpunit/phpunit="^9.5" --with-all-dependencies', context: $composerContext);
+    run('symfony composer require --dev --no-scripts friendsofphp/php-cs-fixer', context: $composerContext);
+    run('symfony composer require --no-scripts cweagans/composer-patches', context: $composerContext);
+    run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', context: $composerContext);
 
     # Fix for sylius and doctrine conflict
     io()->info('Add conflict for doctrine/orm in order to fix an issue in Sylius.');
-    run("cat composer.json | jq --indent 4 '.conflict += {\"doctrine/orm\": \">= 2.15.2\"}' > composer.json.tmp", path: 'apps/sylius/');
-    run('mv composer.json.tmp composer.json', path: 'apps/sylius/');
+    run("cat composer.json | jq --indent 4 '.conflict += {\"doctrine/orm\": \">= 2.15.2\"}' > composer.json.tmp", context: $composerContext);
+    run('mv composer.json.tmp composer.json', context: $composerContext);
     io()->info('Run composer update after updating the composer.json file.');
-    run('symfony composer update', timeout: false, path: 'apps/sylius/');
+    run('symfony composer update', context: $composerContext);
 
     # Copy dist files
     run('cp -Rv dist/sylius/ apps/sylius'); // We have hidden files in dist/sylius
@@ -104,11 +112,11 @@ function setup(
     fs()->appendToFile('apps/sylius/.gitignore', '/public/_themes' . PHP_EOL);
 
     # We want to commit the composer.lock and yarn.lock
-    run('sed -i "" -e "/composer.lock/d" .gitignore', allowFailure: true, path: 'apps/sylius/');
-    run('sed -i "" -e "/yarn.lock/d" .gitignore', allowFailure: true, path: 'apps/sylius/');
+    run('sed -i "" -e "/composer.lock/d" .gitignore', workingDirectory: 'apps/sylius/', allowFailure: true);
+    run('sed -i "" -e "/yarn.lock/d" .gitignore', workingDirectory: 'apps/sylius/', allowFailure: true);
 
     # install
-    run('make install', timeout: false);
+    run('make install', context: $noTimeoutContext);
 
     # GHA
     run('cp -Rv _.github/* .github/');
@@ -120,7 +128,7 @@ function setup(
     run('rm -rf apps/sylius/src/Entity/.gitignore');
 
     # Fix PHP CS
-    run('make test.phpcs.fix', timeout: false);
+    run('make test.phpcs.fix', context: $noTimeoutContext);
 
     io()->success('Your project has been setup!');
     io()->comment('You can now commit the changes!');
