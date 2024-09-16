@@ -57,10 +57,7 @@ function setup(
     file_put_contents('apps/sylius/.php-version', $phpVersion);
 
     # Cleanup the composer.json
-    $repo = strtolower(capture('gh repo view --json nameWithOwner --jq .nameWithOwner | cat'));
-    if ($repo === 'no git remotes found') {
-        $repo = "monsieurbiz/project";
-    }
+    $repo = strtolower(capture('gh repo view --json nameWithOwner --jq .nameWithOwner', onFailure: 'monsieurbiz/project'));
     run('symfony composer config name "' . $repo . '"', context: $composerContext);
     run('symfony composer config description "' . $repo . '"', context: $composerContext);
     run('symfony composer config license proprietary', context: $composerContext);
