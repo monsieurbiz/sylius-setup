@@ -8,7 +8,7 @@ test.composer: ## Validate composer.json
 	$(call symfony.composer,validate --strict)
 
 test.phpstan: ## Run PHPStan
-	${PHPSTAN} analyse -c phpstan.neon src/ plugins/
+	${PHPSTAN} analyse -c phpstan.neon
 
 test.phpunit: ## Run PHPUnit
 	${PHPUNIT}

@@ -1,10 +1,10 @@
 parameters:
-    level: max
+    level: 8
     paths:
-        - %rootDir%/src/
-
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
+        - src/
+        - plugins/
 
     ignoreErrors:
         - '/Generator expects value type Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface\, object given\./'
+#        - identifier: missingType.iterableValue
+#        - identifier: missingType.generics
