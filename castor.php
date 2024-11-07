@@ -15,8 +15,8 @@ use function Castor\run;
 import(__DIR__ . '/.castor/');
 
 const DEFAULT_TIMEOUT_COMPOSER_PROCESS = 120;
-const SUGGESTED_PHP_VERSION = '8.2';
-const SUGGESTED_SYLIUS_VERSION = '1.12';
+const SUGGESTED_PHP_VERSION = '8.3';
+const SUGGESTED_SYLIUS_VERSION = '1.13';
 
 #[AsTask(namespace: 'local', description: 'Reset local project. Be careful!')]
 function reset(): void
