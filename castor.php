@@ -62,7 +62,7 @@ function setup(
 
     # sylius
     $syliusVersion = $sylius ?? io()->ask('Which Sylius version do you want?', SUGGESTED_SYLIUS_VERSION);
-    run('symfony composer create-project --no-scripts sylius/sylius-standard=^' . $syliusVersion . '.0 apps/sylius', context: $noTimeoutContext);
+    run('symfony composer create-project --no-scripts sylius/sylius-standard=~' . $syliusVersion . '.0 apps/sylius', context: $noTimeoutContext);
     file_put_contents('apps/sylius/.env.dev', 'MAILER_DSN=smtp://localhost:1025');
     file_put_contents('apps/sylius/.php-version', $phpVersion);
 
