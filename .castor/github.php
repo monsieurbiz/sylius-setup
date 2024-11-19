@@ -4,6 +4,7 @@ namespace MonsieurBiz\SyliusSetup\Castor\Github;
 
 use Castor\Attribute\AsOption;
 use Castor\Attribute\AsTask;
+use Symfony\Component\Console\Completion\CompletionInput;
 
 use function Castor\io;
 use function Castor\run;
@@ -11,10 +12,15 @@ use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_PHP_VERSION;
 
 const SUGGESTED_ENVS = ['staging', 'prod'];
 
+function autocomple_suggested_env(CompletionInput $input): array
+{
+    return SUGGESTED_ENVS;
+}
+
 #[AsTask(name: 'init', namespace: 'github:project', description: 'Init project configuration')]
 function initGithubProjectConfig(
     #[AsOption(description: 'Default branch name')] ?string $defaultBranch = 'develop',
-    #[AsOption(description: 'PHP Version', autocomplete: [SUGGESTED_PHP_VERSION])] ?string $php = null,
+    #[AsOption(description: 'PHP Version', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\autocomple_php_version')] ?string $php = null,
     #[AsOption(description: 'Approving review count')] int $approvingReviewCount = 1,
     #[AsOption(description: 'Autolink prefix, example: TICKET-')] ?string $autoLinkPrefix = null,
     #[AsOption(description: 'Autolink url template, example: https://example.com/issues/<num>')] ?string $autoLinkUrlTemplate = null,
@@ -70,7 +76,7 @@ function initGithubProjectConfig(
 
 #[AsTask(name: 'init', namespace: 'github:env', description: 'Init environment (and variables if needed)')]
 function initGithubEnv(
-    #[AsOption(description: 'Kind of environment', autocomplete: SUGGESTED_ENVS)] ?string $environment = null,
+    #[AsOption(description: 'Kind of environment', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\Github\autocomple_suggested_env')] ?string $environment = null,
     #[AsOption(description: 'CLEVER_TOKEN value')] ?string $token = null,
     #[AsOption(description: 'CLEVER_SECRET value')] ?string $secret = null,
     #[AsOption(description: 'Setup the repository variables')] ?bool $setupEnvs = null,
@@ -111,7 +117,7 @@ function initGithubEnv(
 
 #[AsTask(name: 'init', namespace: 'github:variables', description: 'Init repository variables')]
 function initGithubVariables(
-    #[AsOption(description: 'Kind of environment', autocomplete: SUGGESTED_ENVS)] ?string $environment = null,
+    #[AsOption(description: 'Kind of environment', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\Github\autocomple_suggested_env')] ?string $environment = null,
     #[AsOption(description: 'Production branch name')] ?string $branch = null,
     #[AsOption(description: 'Production URL')] ?string $url = null,
 ): void {

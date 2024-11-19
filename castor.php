@@ -5,6 +5,7 @@ namespace MonsieurBiz\SyliusSetup\Castor;
 use Castor\Attribute\AsOption;
 use Castor\Attribute\AsTask;
 use Castor\Context;
+use Symfony\Component\Console\Completion\CompletionInput;
 
 use function Castor\capture;
 use function Castor\fs;
@@ -28,10 +29,19 @@ function reset(): void
     }
 }
 
+function autocomple_php_version(CompletionInput $input): array
+{
+    return [SUGGESTED_PHP_VERSION];
+}
+function autocomple_sylius_version(CompletionInput $input): array
+{
+    return [SUGGESTED_SYLIUS_VERSION];
+}
+
 #[AsTask(namespace: 'local', description: 'Init project')]
 function setup(
-    #[AsOption(description: 'PHP Version', autocomplete: [SUGGESTED_PHP_VERSION])] ?string $php = null,
-    #[AsOption(description: 'Sylius major version', autocomplete: [SUGGESTED_SYLIUS_VERSION])] ?string $sylius = null,
+    #[AsOption(description: 'PHP Version', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\autocomple_php_version')] ?string $php = null,
+    #[AsOption(description: 'Sylius major version', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\autocomple_sylius_version')] ?string $sylius = null,
 ): void {
     # PHP Version
     $phpVersion = $php ?? io()->ask('Which PHP do you want?', SUGGESTED_PHP_VERSION);
