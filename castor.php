@@ -16,8 +16,8 @@ use function Castor\run;
 import(__DIR__ . '/.castor/');
 
 const DEFAULT_TIMEOUT_COMPOSER_PROCESS = 120;
-const SUGGESTED_PHP_VERSION = '8.2';
-const SUGGESTED_SYLIUS_VERSION = '1.12';
+const SUGGESTED_PHP_VERSION = '8.3';
+const SUGGESTED_SYLIUS_VERSION = '2.0';
 
 #[AsTask(namespace: 'local', description: 'Reset local project. Be careful!')]
 function reset(): void
@@ -92,17 +92,19 @@ function setup(
 
     # Add or update packages
     run('symfony composer require --dev --no-scripts phpmd/phpmd="*"', context: $composerContext);
-    run('symfony composer require --dev --no-scripts phpunit/phpunit="^9.5" --with-all-dependencies', context: $composerContext);
+    run('symfony composer require --dev --no-scripts phpunit/phpunit --with-all-dependencies', context: $composerContext);
     run('symfony composer require --dev --no-scripts friendsofphp/php-cs-fixer', context: $composerContext);
     run('symfony composer require --no-scripts cweagans/composer-patches', context: $composerContext);
     run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', context: $composerContext);
 
-    # Fix for sylius and doctrine conflict
-    io()->info('Add conflict for doctrine/orm in order to fix an issue in Sylius.');
-    run("cat composer.json | jq --indent 4 '.conflict += {\"doctrine/orm\": \">= 2.15.2\"}' > composer.json.tmp", context: $composerContext);
-    run('mv composer.json.tmp composer.json', context: $composerContext);
-    io()->info('Run composer update after updating the composer.json file.');
-    run('symfony composer update', context: $composerContext);
+    # Fix for sylius and doctrine conflict, for Sylius 1.x only
+    if (io()->confirm('Do you want to fix a conflict with doctrine? Highly recommended for Sylius 1.x ONLY!', false)) {
+        io()->info('Add conflict for doctrine/orm in order to fix an issue in Sylius.');
+        run("cat composer.json | jq --indent 4 '.conflict += {\"doctrine/orm\": \">= 2.15.2\"}' > composer.json.tmp", context: $composerContext);
+        run('mv composer.json.tmp composer.json', context: $composerContext);
+        io()->info('Run composer update after updating the composer.json file.');
+        run('symfony composer update', context: $composerContext);
+    }
 
     # Copy dist files
     run('cp -Rv dist/sylius/ apps/sylius'); // We have hidden files in dist/sylius
