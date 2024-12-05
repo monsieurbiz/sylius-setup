@@ -82,7 +82,7 @@ function setup(
 
     # Add or update packages
     run('symfony composer require --dev --no-scripts phpmd/phpmd="*"', context: $composerContext);
-    run('symfony composer require --dev --no-scripts phpunit/phpunit="^9.5" --with-all-dependencies', context: $composerContext);
+    run('symfony composer require --dev --no-scripts phpunit/phpunit --with-all-dependencies', context: $composerContext);
     run('symfony composer require --dev --no-scripts friendsofphp/php-cs-fixer', context: $composerContext);
     run('symfony composer require --no-scripts cweagans/composer-patches', context: $composerContext);
     run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', context: $composerContext);
