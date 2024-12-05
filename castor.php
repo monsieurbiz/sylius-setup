@@ -16,8 +16,8 @@ use function Castor\run;
 import(__DIR__ . '/.castor/');
 
 const DEFAULT_TIMEOUT_COMPOSER_PROCESS = 120;
-const SUGGESTED_PHP_VERSION = '8.2';
-const SUGGESTED_SYLIUS_VERSION = '1.12';
+const SUGGESTED_PHP_VERSION = '8.3';
+const SUGGESTED_SYLIUS_VERSION = '1.13';
 
 #[AsTask(namespace: 'local', description: 'Reset local project. Be careful!')]
 function reset(): void
@@ -92,7 +92,7 @@ function setup(
 
     # Add or update packages
     run('symfony composer require --dev --no-scripts phpmd/phpmd="*"', context: $composerContext);
-    run('symfony composer require --dev --no-scripts phpunit/phpunit="^9.5" --with-all-dependencies', context: $composerContext);
+    run('symfony composer require --dev --no-scripts phpunit/phpunit --with-all-dependencies', context: $composerContext);
     run('symfony composer require --dev --no-scripts friendsofphp/php-cs-fixer', context: $composerContext);
     run('symfony composer require --no-scripts cweagans/composer-patches', context: $composerContext);
     run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', context: $composerContext);
