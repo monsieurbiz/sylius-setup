@@ -5,6 +5,7 @@
 You will need : 
 - [Castor](https://github.com/jolicode/castor#readme) as a task runner
 - [symfony](https://github.com/symfony-cli/symfony-cli#readme) as a PHP wrapper.
+- [node](https://github.com/nodejs/node#readme) at least at version 20.
 - [jq](https://jqlang.github.io/jq/download/) as a command-line JSON processor.
 - [gh](https://cli.github.com/) as a Github tool.
 
