@@ -38,10 +38,22 @@ jobs:
                 run: |
                     echo "${{ matrix.php }}" > .php-version
 
-            -   name: Install WKHTMLTOPDF
-                run: |
-                    wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb
-                    sudo apt install ./wkhtmltox_0.12.6-1.focal_amd64.deb
+            - name: Cache WKHTMLTOPDF
+              uses: actions/cache@v3
+              id: cache-wkhtmltopdf-0-12-6-1-3
+              with:
+                  path: "~/wkhtmltox/"
+                  key: ${{ runner.os }}-wkhtmltopdf-${{ hashFiles('**/*.deb') }}
+
+            - name: Download WKHTMLTOPDF
+              if: steps.cache-wkhtmltopdf-0-12-6-1-3.outputs.cache-hit != 'true'
+              run: |
+                  mkdir ~/wkhtmltox
+                  wget -O ~/wkhtmltox/wkhtmltox.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+
+            - name: Install WKHTMLTOPDF
+              run: |
+                  sudo apt install ~/wkhtmltox/wkhtmltox.deb
 
             -   name: Get composer cache directory
                 id: composer-cache
