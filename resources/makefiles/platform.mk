@@ -3,7 +3,7 @@
 ### ¯¯¯¯¯¯¯¯
 
 define docker-compose
-	cd ${DC_DIR} && docker-compose -p ${DC_PREFIX} $(1)
+	cd ${DC_DIR} && docker compose -p ${DC_PREFIX} $(1)
 endef
 
 platform: .php-version symfony.domain.attach up ## Setup the platform tools
