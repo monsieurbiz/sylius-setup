@@ -94,7 +94,8 @@ function setup(
     run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', context: $composerContext);
 
     # Fix for sylius and doctrine conflict, for Sylius 1.x only
-    if (io()->confirm('Do you want to fix a conflict with doctrine? Highly recommended for Sylius 1.x ONLY!', false)) {
+    $syliusMajorVersion = intval(explode('.', $syliusVersion)[0] ?? '1');
+    if ($syliusMajorVersion === 1 && io()->confirm('Do you want to fix a conflict with doctrine? Highly recommended for Sylius 1.x ONLY!', false)) {
         io()->info('Add conflict for doctrine/orm in order to fix an issue in Sylius.');
         run("cat composer.json | jq --indent 4 '.conflict += {\"doctrine/orm\": \">= 2.15.2\"}' > composer.json.tmp", context: $composerContext);
         run('mv composer.json.tmp composer.json', context: $composerContext);
@@ -117,8 +118,8 @@ function setup(
     fs()->appendToFile('apps/sylius/.gitignore', '/public/_themes' . PHP_EOL);
 
     # We want to commit the composer.lock and yarn.lock
-    run('sed -i "" -e "/composer.lock/d" .gitignore', workingDirectory: 'apps/sylius/', context: context()->withAllowFailure());
-    run('sed -i "" -e "/yarn.lock/d" .gitignore', workingDirectory: 'apps/sylius/', context: context()->withAllowFailure());
+    run('sed -i "" -e "/composer.lock/d" .gitignore', context: context()->withAllowFailure()->withWorkingDirectory('apps/sylius/'));
+    run('sed -i "" -e "/yarn.lock/d" .gitignore', context: context()->withAllowFailure()->withWorkingDirectory('apps/sylius/'));
 
     # install
     run('make install', context: $noTimeoutContext);
