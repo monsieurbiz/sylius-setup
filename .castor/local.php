@@ -23,6 +23,8 @@ function reset(): void
     if (io()->confirm('Are you sure? This is a destructive action!', false)) {
         run('make down docker.destroy || true');
         run('rm -rf apps/sylius');
+        run('rm -rf .github');
+        run('git reset --hard HEAD');
         io()->success('Reset done!');
     }
 }
