@@ -20,7 +20,7 @@ export -f copy_dist_files
 
 function protect_application() {
   # Append the content of security file in `.htaccess` if protected
-  if [ "${IS_PROTECTED}" == "true" ]; then
+  if [ "${IS_PROTECTED:-false}" == "true" ]; then
     echo -e "$(cat ${APP_HOME}/clevercloud/security_htaccess)\n\n$(cat ${APP_HOME}${CC_WEBROOT}/.htaccess)" >${APP_HOME}${CC_WEBROOT}/.htaccess
     if [ -n "${HTTP_AUTH_USERNAME:-}" ] && [ -n "${HTTP_AUTH_PASSWORD:-}" ]; then
       if [ "${HTTP_AUTH_CLEAR:-false}" == "true" ]; then
@@ -28,6 +28,19 @@ function protect_application() {
       fi
       htpasswd -b ${APP_HOME}/clevercloud/.htpasswd ${HTTP_AUTH_USERNAME} ${HTTP_AUTH_PASSWORD}
     fi
+  fi
+
+  # Append the content of internal host file after the like contains "RewriteEngine On" in `.htaccess` if a proxy is used
+  # In clevercloud, you can link the php app to the proxy app and add `USE_INTERNAL_HOST` in the exposed configuration on the proxy app
+  if [ "${USE_INTERNAL_HOST:-false}" == "true" ]; then
+    awk '
+    /RewriteEngine On/ {
+        print $0;
+        system("cat ${APP_HOME}/clevercloud/internal_host_htaccess");
+        next;
+    }
+    { print }
+    ' ${APP_HOME}${CC_WEBROOT}/.htaccess > /tmp/.htaccess.new && mv /tmp/.htaccess.new ${APP_HOME}${CC_WEBROOT}/.htaccess
   fi
 }
 export -f protect_application
