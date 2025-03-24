@@ -6,6 +6,7 @@ use Castor\Attribute\AsOption;
 use Castor\Attribute\AsTask;
 use Symfony\Component\Console\Completion\CompletionInput;
 
+use function Castor\capture;
 use function Castor\context;
 use function Castor\io;
 use function Castor\run;
