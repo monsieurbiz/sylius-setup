@@ -150,7 +150,7 @@ function setup(
 function cleanUp(): void
 {
     if (io()->confirm('Are you sure? This is a destructive action!', false)) {
-        run('rm -rf castor');
+        run('rm -rf .castor');
         run('rm castor.php');
         io()->success('Clean up done!');
     }
