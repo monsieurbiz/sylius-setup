@@ -10,11 +10,18 @@ You will need :
 - [gh](https://cli.github.com/) as a Github tool.
 
 Then you can : 
-
 - Use this template project as a new project in GitHub.
 - Clone your project and run `castor local:setup` inside it.
 - Clean the castor files if you don't want them in your project with `castor local:clean-up`.
 - And code!
+
+Go further : 
+- Setup your GitHub repository with `castor github:project:init`.
+- Setup your Clever Cloud environment with `castor clevercloud:setup`.
+- Setup your GitHub environment with `castor github:env:setup`.
+- Install Sylius plugins with `castor sylius:plugins:install`.
+
+⚠️ Sylius plugins setup is not yet implemented for Sylius 2.x
 
 ## Setup GitHub Repository
 
