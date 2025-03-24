@@ -10,7 +10,7 @@ You will need :
 - [gh](https://cli.github.com/) as a Github tool.
 
 Then you can : 
-- Use this template project as a new project in GitHub.
+- Use this [template project as a new project in GitHub](https://monsieurbiz.com/media/gallery/images/plugins/setup.png).
 - Clone your project and run `castor local:setup` inside it.
 - Clean the castor files if you don't want them in your project with `castor local:clean-up`.
 - And code!
