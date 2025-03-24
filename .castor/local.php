@@ -11,11 +11,11 @@ use function Castor\context;
 use function Castor\fs;
 use function Castor\io;
 use function Castor\run;
-
+use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_PHP_VERSION;
+use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_SYLIUS_VERSION;
+use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_SYLIUS_APPLICATION_NAME;
 
 const DEFAULT_TIMEOUT_COMPOSER_PROCESS = 120;
-const SUGGESTED_PHP_VERSION = '8.3';
-const SUGGESTED_SYLIUS_VERSION = '2.0';
 
 #[AsTask(namespace: 'local', description: 'Reset local project. Be careful!')]
 function reset(): void
@@ -31,7 +31,12 @@ function reset(): void
 function setup(
     #[AsOption(description: 'PHP Version', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\autocomple_php_version')] ?string $php = null,
     #[AsOption(description: 'Sylius major version', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\autocomple_sylius_version')] ?string $sylius = null,
+    #[AsOption(description: 'Name of your Sylius application (ex: `monsieurbiz`)', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\autocomple_sylius_application_name')] ?string $applicationName = null,
 ): void {
+    # Application name
+    $syliusApplicationName = $applicationName ?? io()->ask('Which application name do you want?', SUGGESTED_SYLIUS_APPLICATION_NAME);
+    run('sed -i "" -e "s/APP_NAME=[^ ]*/APP_NAME=' . $syliusApplicationName . '/" Makefile');
+
     # PHP Version
     $phpVersion = $php ?? io()->ask('Which PHP do you want?', SUGGESTED_PHP_VERSION);
     file_put_contents('.php-version', $phpVersion);
