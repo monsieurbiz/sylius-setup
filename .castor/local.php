@@ -35,12 +35,19 @@ function setup(
     #[AsOption(description: 'Sylius major version', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\autocomple_sylius_version')] ?string $sylius = null,
     #[AsOption(description: 'Name of your Sylius application (ex: `monsieurbiz`)', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\autocomple_sylius_application_name')] ?string $applicationName = null,
 ): void {
-    # Application name
+    # Ask questions
     $syliusApplicationName = $applicationName ?? io()->ask('Which application name do you want?', SUGGESTED_SYLIUS_APPLICATION_NAME);
+    $phpVersion = $php ?? io()->ask('Which PHP do you want?', SUGGESTED_PHP_VERSION);
+    $syliusVersion = $sylius ?? io()->ask('Which Sylius version do you want?', SUGGESTED_SYLIUS_VERSION);
+
+    # Fix for sylius and doctrine conflict, for Sylius 1.x only
+    $syliusMajorVersion = intval(explode('.', $syliusVersion)[0] ?? '1');
+    $fixDoctrineConflict = $syliusMajorVersion === 1 && io()->confirm('Do you want to fix a conflict with doctrine? Highly recommended for Sylius 1.x ONLY!', false);
+
+    # Application name
     run('sed -i "" -e "s/APP_NAME=[^ ]*/APP_NAME=' . $syliusApplicationName . '/" Makefile');
 
     # PHP Version
-    $phpVersion = $php ?? io()->ask('Which PHP do you want?', SUGGESTED_PHP_VERSION);
     file_put_contents('.php-version', $phpVersion);
 
     # .gitignore
@@ -57,7 +64,6 @@ function setup(
     );
 
     # sylius
-    $syliusVersion = $sylius ?? io()->ask('Which Sylius version do you want?', SUGGESTED_SYLIUS_VERSION);
     run('symfony composer create-project --no-scripts sylius/sylius-standard=~' . $syliusVersion . '.0 apps/sylius', context: $noTimeoutContext);
     file_put_contents('apps/sylius/.env.dev', 'MAILER_DSN=smtp://localhost:1025');
     file_put_contents('apps/sylius/.php-version', $phpVersion);
@@ -94,8 +100,7 @@ function setup(
     run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', context: $composerContext);
 
     # Fix for sylius and doctrine conflict, for Sylius 1.x only
-    $syliusMajorVersion = intval(explode('.', $syliusVersion)[0] ?? '1');
-    if ($syliusMajorVersion === 1 && io()->confirm('Do you want to fix a conflict with doctrine? Highly recommended for Sylius 1.x ONLY!', false)) {
+    if ($fixDoctrineConflict) {
         io()->info('Add conflict for doctrine/orm in order to fix an issue in Sylius.');
         run("cat composer.json | jq --indent 4 '.conflict += {\"doctrine/orm\": \">= 2.15.2\"}' > composer.json.tmp", context: $composerContext);
         run('mv composer.json.tmp composer.json', context: $composerContext);
