@@ -7,6 +7,7 @@ use Castor\Attribute\AsTask;
 use Castor\Context;
 
 use function Castor\capture;
+use function Castor\context;
 use function Castor\fs;
 use function Castor\io;
 use function Castor\run;
@@ -109,8 +110,8 @@ function setup(
     fs()->appendToFile('apps/sylius/.gitignore', '/public/_themes' . PHP_EOL);
 
     # We want to commit the composer.lock and yarn.lock
-    run('sed -i "" -e "/composer.lock/d" .gitignore', workingDirectory: 'apps/sylius/', allowFailure: true);
-    run('sed -i "" -e "/yarn.lock/d" .gitignore', workingDirectory: 'apps/sylius/', allowFailure: true);
+    run('sed -i "" -e "/composer.lock/d" .gitignore', workingDirectory: 'apps/sylius/', context: context()->withAllowFailure());
+    run('sed -i "" -e "/yarn.lock/d" .gitignore', workingDirectory: 'apps/sylius/', context: context()->withAllowFailure());
 
     # install
     run('make install', context: $noTimeoutContext);
