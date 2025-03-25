@@ -9,6 +9,8 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use function Castor\context;
 use function Castor\io;
 use function Castor\run;
+use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_DEFAULT_ENV;
+use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_ENVS;
 
 #[AsTask(name: 'setup', namespace: 'clevercloud', description: 'Init Clever Cloud application and addons')]
 function cleverSetup(
@@ -25,6 +27,9 @@ function cleverSetup(
     cleverIsRequired();
 
     $project = initProject($code, $name, $org, $env, $hostname);
+    if (io()->confirm("Do you want to setup credentials for protected environment?", null !== $username || null !== $password)) {
+        setupHtpasswd($username, $password);
+    }
     setupPHP($project, $php);
     setupMySQL($project, $mysql);
     setupFSBucket($project);
@@ -49,7 +54,7 @@ function initProject(string $type, ?string $name = null, ?string $org = null, ?s
     };
     $project->name = $name ?? io()->ask('What is the name of your project?');
     $project->org = $org ?? io()->ask('What is the organization ID from Clever cloud (its name or its code starting with org_)?');
-    $project->env = $env ?? io()->askQuestion(new ChoiceQuestion('Which environment?', ['staging', 'prod'], 'prod'));
+    $project->env = $env ?? io()->askQuestion(new ChoiceQuestion('Which environment?', SUGGESTED_ENVS, SUGGESTED_DEFAULT_ENV));
     $project->id = sprintf('%s-%s', $type, $project->env);
     $project->hostname = sprintf($hostname, $project->id);
 
