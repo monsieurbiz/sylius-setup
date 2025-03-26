@@ -127,7 +127,7 @@ function initGithubVariables(
 
     if ($environment === 'production') {
         $branch = $branch ?? io()->ask('PRODUCTION_BRANCH?', 'master');
-        $url = $url ?? io()->ask('PRODUCTION_URL?', 'https://project.preprod.monsieurbiz.com');
+        $url = $url ?? io()->ask('PRODUCTION_URL?', 'https://project.preprod.monsieurbiz.cloud');
         return;
     }
 
