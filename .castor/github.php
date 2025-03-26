@@ -128,12 +128,18 @@ function initGithubVariables(
     if ($environment === 'production') {
         $branch = $branch ?? io()->ask('PRODUCTION_BRANCH?', 'master');
         $url = $url ?? io()->ask('PRODUCTION_URL?', 'https://project.preprod.monsieurbiz.cloud');
+
+        run('gh variable set PRODUCTION_URL -b ' . $url);
+        run('gh variable set PRODUCTION_BRANCH -b ' . $branch);
         return;
     }
 
     if ($environment === 'staging') {
         $branch = $branch ?? io()->ask('STAGING_BRANCH?', 'develop');
         $url = $url ?? io()->ask('STAGING_URL?', 'https://project.staging.monsieurbiz.cloud');
+
+        run('gh variable set STAGING_URL -b ' . $url);
+        run('gh variable set STAGING_BRANCH -b ' . $branch);
         return;
     }
 
