@@ -40,9 +40,11 @@ function cleverSetup(
     createFSBuckets($project);
     setupEnv($project);
     setupClevercloudFiles($project);
-    setupDomain($project, $hostname);
-    if (io()->confirm("Do you want to setup credentials for protected environment?", null !== $username || null !== $password)) {
-        setupHtpasswd($username, $password);
+    setupDomain($project);
+
+    $proxySetup = io()->confirm('Do you want to setup a proxy?', false);
+    if ($proxySetup) {
+        cleverSetupProxy($project);
     }
 
     io()->success('Your project is ready!');
@@ -332,4 +334,95 @@ function cleverIsRequired(): void
         io()->error('You should login to your Clever Cloud account first using the "clever login" command.');
         exit(1);
     }
+}
+
+#[AsTask(name: 'proxy', namespace: 'clevercloud', description: 'Add a proxy to your application')]
+function cleverSetupProxy(?object $project = null, ?string $internalDomainSuffix = null, ?string $rioProjectKey = null): void {
+    cleverIsRequired();
+
+    $project = $project ?? initProject('sylius');
+
+    // Retrieve associated application ID
+    $applicationId = getApplicationId($project->org, $project->env);
+    if (null === $applicationId) {
+        io()->error('No application found with the name ' . $project->env);
+        exit(1);
+    }
+    $rioProjectKey = $rioProjectKey ?? io()->ask('What is the RIO project key?');
+    $suggestedDomainSuffix = $project->env === 'prod' ? '.internal.preprod.monsieurbiz.cloud' : '.internal.staging.monsieurbiz.cloud';
+    $internalDomainSuffix = $internalDomainSuffix ?? io()->ask('What the internal domain suffix?', $suggestedDomainSuffix);
+
+    $proxyAlias = sprintf('%s-proxy', $project->env);
+    $proxyName = sprintf('%s-proxy', $project->id);
+    $applicationAlias = $project->env;
+    $setEnv = function ($name, $value) use ($proxyAlias): void {
+        run(sprintf(
+            'clever env --alias %1$s set %2$s "%3$s"',
+            $proxyAlias,
+            $name,
+            $value
+        ));
+    };
+
+    run(sprintf('clever create --alias "%1$s" -o "%2$s" --type node --region "%3$s" --github "monsieurbiz/redirectionio-proxy" "%4$s"',
+        $proxyAlias,
+        $project->org,
+        $project->region,
+        $proxyName,
+    ));
+    run(sprintf('clever scale --alias "%1$s" --flavor XS', $proxyAlias));
+    run(sprintf('clever config --alias %1$s update --enable-zero-downtime --enable-cancel-on-push --enable-force-https', $proxyAlias));
+
+    // Get existing app domains to create the proxy
+    $domain = $project->hostname;
+    $applicationId = str_replace('_', '-', $applicationId); // Replace _ by -, because domain name can't have _
+    $internalDomain = sprintf('%s%s', $applicationId, $internalDomainSuffix);
+    
+    // Remove app domains and create an "internal" domain with app id for app
+    run(sprintf('clever domain rm --alias %s %s', $applicationAlias, $domain));
+    
+    // Add internal domain to app
+    run(sprintf('clever domain add --alias %s %s', $applicationAlias, $internalDomain));
+
+    // Add domain on proxy
+    run(sprintf('clever domain --alias %1$s add %2$s', $proxyAlias, $domain));
+
+    // Set proxy env vars
+    $setEnv('CC_RUN_COMMAND', './redirection-agent/redirectionio-agent --config-file ./agent.yml');
+    $setEnv('CC_PRE_BUILD_HOOK', './clevercloud/pre_build_hook.sh');
+    $setEnv('CC_PRE_RUN_HOOK', './clevercloud/pre_run_hook.sh');
+    $setEnv('PORT', '8080');
+    $setEnv('RIO_INSTANCE_NAME', sprintf('%s CleverCloud', $project->id));
+    $setEnv('RIO_PRESERVE_HOST', 'false');
+    $setEnv('RIO_ADD_RULE_IDS_HEADER', 'true');
+    $setEnv('RIO_COMPRESS', 'true');
+    $setEnv('RIO_REQUEST_BODY_SIZE_LIMIT', '200MB');
+    $setEnv('RIO_LOG_LEVEL', 'info');
+    $setEnv('RIO_PROJECT_KEY', $rioProjectKey ?? ''); // Use command option or complete on Clever Cloud
+    $setEnv('RIO_FORWARD', sprintf('http://%s/', $internalDomain));
+    $setEnv('RIO_TRUSTED_PROXIES', '');
+
+    // Remove "force https" on app
+    run(sprintf('clever config --alias %s update --disable-force-https', $applicationAlias));
+
+    // Try to restart the proxy. This command may fail, but the proxy will continue to run.
+    run(sprintf('clever restart --without-cache --alias %s', $proxyAlias), context: context()->withAllowFailure());
+    io()->success('Your proxy is ready!');
+}
+
+function getApplicationId(string $org, string $name): ?string
+{
+    $cleverApplications = explode(PHP_EOL, run(sprintf('clever applications list -o %s --format=json | jq -r \'.[].applications[] | (.app_id + "#"+ (if .alias|length > 0 then .alias else .name end))\'', $org), context: context()->withQuiet())->getOutput());
+    foreach ($cleverApplications as $cleverApplication) {
+        $cleverApplication = explode('#', trim($cleverApplication));
+        if (count($cleverApplication) !== 2 || str_contains($cleverApplication[1], '-proxy') || str_contains($cleverApplication[1], '-backup')) {
+            continue;
+        }
+        
+        if ($cleverApplication[1] === $name) {
+            return $cleverApplication[0];
+        }
+    }
+
+    return null;
 }
