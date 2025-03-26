@@ -41,8 +41,7 @@ function setup(
     $syliusVersion = $sylius ?? io()->ask('Which Sylius version do you want?', SUGGESTED_SYLIUS_VERSION);
 
     # Fix for sylius and doctrine conflict, for Sylius 1.x only
-    $syliusMajorVersion = intval(explode('.', $syliusVersion)[0] ?? '1');
-    $fixDoctrineConflict = $syliusMajorVersion === 1 && io()->confirm('Do you want to fix a conflict with doctrine? Highly recommended for Sylius 1.x ONLY!', false);
+    $fixDoctrineConflict = version_compare($syliusVersion, '2', '<') && io()->confirm('Do you want to fix a conflict with doctrine? Highly recommended for Sylius 1.x ONLY!', false);
 
     # Application name
     run('sed -i "" -e "s/APP_NAME=[^ ]*/APP_NAME=' . $syliusApplicationName . '/" Makefile');
