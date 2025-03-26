@@ -95,6 +95,7 @@ function setup(
     run('symfony composer require --dev --no-scripts phpmd/phpmd="*"', context: $composerContext);
     run('symfony composer require --dev --no-scripts phpunit/phpunit --with-all-dependencies', context: $composerContext);
     run('symfony composer require --dev --no-scripts friendsofphp/php-cs-fixer', context: $composerContext);
+    // run('symfony composer require --dev --no-scripts phpspec/phpspec="^7.0"', context: $composerContext);
     run('symfony composer require --no-scripts cweagans/composer-patches', context: $composerContext);
     run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', context: $composerContext);
 
