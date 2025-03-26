@@ -250,6 +250,10 @@ function setupEnv(object $project): void
     $bucketHost = trim(run(sprintf('clever env --alias %1$s | grep BUCKET_HOST | cut -d"=" -f2', $project->env), context: context()->withQuiet())->getOutput());
     $databaseUri = trim(run(sprintf('clever env --alias %1$s | grep MYSQL_ADDON_URI | cut -d"=" -f2', $project->env), context: context()->withQuiet())->getOutput());
     $runFixtures = io()->confirm('Do you want to run fixtures?', true);
+    $fixturesSuite = 'default';
+    if ($runFixtures) {
+        $fixturesSuite = io()->ask('Which fixtures suite?', default: $fixturesSuite);
+    }
     $phpVersion = io()->ask('Which PHP version?', default: '8.3');
 
     // Buckets env vars
@@ -288,6 +292,7 @@ function setupEnv(object $project): void
     $setEnv('HTTP_AUTH_PASSWORD', '');
     $setEnv('MEMORY_LIMIT', '256M');
     $setEnv('SYLIUS_FIXTURES_HOSTNAME', $project->hostname);
+    $setEnv('SYLIUS_FIXTURES_SUITE', $fixturesSuite);
     $setEnv('APP_JPEGOPTIM_BINARY', '/usr/host/bin/jpegoptim');
     $setEnv('APP_PNGQUANT_BINARY', '/usr/host/bin/pngquant');
     $setEnv('WKHTMLTOIMAGE_PATH', '/usr/host/bin/wkhtmltoimage');
