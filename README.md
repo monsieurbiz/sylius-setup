@@ -12,6 +12,7 @@ You will need :
 Then you can : 
 - Use this [template project as a new project in GitHub](https://monsieurbiz.com/media/gallery/images/plugins/setup.png).
 - Clone your project with `gh repo clone monsieurbiz/your-repo` 
+- Before running the setup, be sure you have not another Docker container running on the same port as the one you will use for your project.
 - Run `castor local:setup -v` inside it.
 
 Go further : 
@@ -31,6 +32,51 @@ When you have finished :
 - Clean the castor files if you don't want them in your project with `castor local:clean-up -v`.
 - It will ask you if you want to commit the `composer.lock` file.
 - And code!
+
+## Projects management
+
+The projects information are saved in `.projects.json` file.
+This avoid you to type the same information each time you run a command.
+
+Example : 
+
+```json
+{
+    "sylius-staging": {
+        "org": "orga_9fa29bee-1f73-4a76-8f51-ff37e9e8ef3e",
+        "region": "par",
+        "env": "staging",
+        "id": "sylius-staging",
+        "hostname": "project.staging.monsieurbiz.cloud",
+        "buckets": {
+            "media": "\/apps\/sylius\/public\/media",
+            "log": "\/apps\/sylius\/var\/log",
+            "private": "\/apps\/sylius\/private"
+        }
+    },
+    "sylius-prod": {
+        "org": "orga_9fa29bee-1f73-4a76-8f51-ff37e9e8ef3e",
+        "region": "par",
+        "env": "prod",
+        "id": "sylius-prod",
+        "hostname": "project.preprod.monsieurbiz.cloud",
+        "buckets": {
+            "media": "\/apps\/sylius\/public\/media",
+            "log": "\/apps\/sylius\/var\/log",
+            "private": "\/apps\/sylius\/private"
+        }
+    }
+}
+```
+
+Then when you run `clevercloud:setup` or `clevercloud:proxy` you will be asked for the project or create a new one : 
+
+```
+ Which project? [New project]:
+  [0] New project
+  [1] sylius-staging
+  [2] sylius-prod
+```
 
 ## Local commands
 

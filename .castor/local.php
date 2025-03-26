@@ -95,6 +95,7 @@ function setup(
     run('symfony composer require --dev --no-scripts phpmd/phpmd="*"', context: $composerContext);
     run('symfony composer require --dev --no-scripts phpunit/phpunit --with-all-dependencies', context: $composerContext);
     run('symfony composer require --dev --no-scripts friendsofphp/php-cs-fixer', context: $composerContext);
+    // run('symfony composer require --dev --no-scripts phpspec/phpspec="^7.0"', context: $composerContext);
     run('symfony composer require --no-scripts cweagans/composer-patches', context: $composerContext);
     run('symfony composer require --dev --no-scripts szeidler/composer-patches-cli', context: $composerContext);
 
@@ -151,8 +152,11 @@ function cleanUp(): void
     if (io()->confirm('Are you sure? This is a destructive action!', false)) {
         run('rm -rf .castor');
         run('rm castor.php');
-        if (io()->confirm('Do you want to commit your `composer.lock` file?', false)) {
+        if (io()->confirm('Do you want to commit your `composer.lock` file?', true)) {
             run('sed -i "" -e "/composer.lock/d" .gitignore', context: context()->withAllowFailure()->withWorkingDirectory('apps/sylius/'));
+        }
+        if (io()->confirm('Do you want to commit your `phpstan.neon` file?', true)) {
+            run('sed -i "" -e "/phpstan.neon/d" .gitignore', context: context()->withAllowFailure()->withWorkingDirectory('apps/sylius/'));
         }
         io()->success('Clean up done!');
     }

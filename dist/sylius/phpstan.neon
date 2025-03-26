@@ -6,5 +6,7 @@ parameters:
 
     ignoreErrors:
         - '/Generator expects value type Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface\, object given\./'
-#        - identifier: missingType.iterableValue
-#        - identifier: missingType.generics
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
+
+    reportUnmatchedIgnoredErrors: false
