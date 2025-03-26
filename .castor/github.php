@@ -4,18 +4,15 @@ namespace MonsieurBiz\SyliusSetup\Castor\Github;
 
 use Castor\Attribute\AsOption;
 use Castor\Attribute\AsTask;
-use Symfony\Component\Console\Completion\CompletionInput;
 
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use function Castor\capture;
+use function Castor\context;
 use function Castor\io;
 use function Castor\run;
 use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_PHP_VERSION;
-
-const SUGGESTED_ENVS = ['staging', 'prod'];
-
-function autocomple_suggested_env(CompletionInput $input): array
-{
-    return SUGGESTED_ENVS;
-}
+use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_DEFAULT_ENV;
+use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_ENVS;
 
 #[AsTask(name: 'init', namespace: 'github:project', description: 'Init project configuration')]
 function initGithubProjectConfig(
@@ -34,20 +31,22 @@ function initGithubProjectConfig(
     $phpVersion = $php ?? io()->ask('Which PHP do you want?', SUGGESTED_PHP_VERSION);
 
     // Github details for API calls
-    $ghToken = trim(capture('gh auth token', allowFailure: false));
-    $ghRepo = trim(capture('gh repo view --json nameWithOwner --jq .nameWithOwner | cat', allowFailure: false));
+    $ghToken = trim(capture('gh auth token'));
+    $ghRepo = trim(capture('gh repo view --json nameWithOwner --jq .nameWithOwner | cat'));
 
     // Check if autolink reference exists and create it if not
+    $autoLinkPrefix = $autoLinkPrefix ?? io()->ask('Autolink prefix (example: MBIZ-)', 'MBIZ-');
+    $autoLinkUrlTemplate = $autoLinkUrlTemplate ?? io()->ask('Autolink URL template (example: https://support.monsieurbiz.com/issues/<num>)', 'https://support.monsieurbiz.com/issues/<num>');
     if ($autoLinkPrefix && $autoLinkUrlTemplate) {
-        $autolink = capture(sprintf('gh api /repos/%s/autolinks --jq \'.[] | select(.key_prefix=="%s") | .id\'', $ghRepo, $autoLinkPrefix), allowFailure: true);
+        $autolink = capture(sprintf('gh api /repos/%s/autolinks --jq \'.[] | select(.key_prefix=="%s") | .id\'', $ghRepo, $autoLinkPrefix), context: context()->withAllowFailure());
         if (!$autolink) {
             run(sprintf('gh api --silent --method POST -f key_prefix="%s" -f url_template="%s" -F is_alphanumeric=true "/repos/%s/autolinks"', $autoLinkPrefix, $autoLinkUrlTemplate, $ghRepo));
         }
     }
 
     // Create "develop" branch, push it and change default branch to "develop"
-    run(sprintf('git checkout -b %s', $defaultBranch), quiet: true, allowFailure: true); // Allow failure in case the branch already exists
-    run(sprintf('git push -u origin %s', $defaultBranch), quiet: true);
+    run(sprintf('git checkout -b %s', $defaultBranch), context: context()->withQuiet()->withAllowFailure()); // Allow failure in case the branch already exists
+    run(sprintf('git push -u origin %s', $defaultBranch), context: context()->withQuiet());
     $ghDefaultBranch = capture(sprintf('gh api --method PATCH -f default_branch=%s "/repos/%s" --jq .default_branch', $defaultBranch, $ghRepo));
     if ($ghDefaultBranch !== $defaultBranch) {
         io()->error('Default branch not updated!');
@@ -65,7 +64,7 @@ function initGithubProjectConfig(
         https://api.github.com/repos/$ghRepo/branches/$defaultBranch/protection \
         -d '{"required_status_checks":{"strict":true,"contexts":["Tests (PHP $phpVersion)"]}, "enforce_admins": null, "required_pull_request_reviews": {"required_approving_review_count":$approvingReviewCount}, "restrictions": null,"required_conversation_resolution":true}'
     CMD;
-    run($command, quiet: true);
+    run($command, context: context()->withQuiet());
     run(sprintf('gh api --silent --method POST "/repos/%s/branches/%s/protection/required_signatures"', $ghRepo, $defaultBranch));
 
     // Allow "Auto-merge" and "Automatically delete head branches"
@@ -76,7 +75,7 @@ function initGithubProjectConfig(
 
 #[AsTask(name: 'init', namespace: 'github:env', description: 'Init environment (and variables if needed)')]
 function initGithubEnv(
-    #[AsOption(description: 'Kind of environment', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\Github\autocomple_suggested_env')] ?string $environment = null,
+    #[AsOption(description: 'Kind of environment', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\autocomple_suggested_env')] ?string $environment = null,
     #[AsOption(description: 'CLEVER_TOKEN value')] ?string $token = null,
     #[AsOption(description: 'CLEVER_SECRET value')] ?string $secret = null,
     #[AsOption(description: 'Setup the repository variables')] ?bool $setupEnvs = null,
@@ -84,10 +83,12 @@ function initGithubEnv(
     #[AsOption(description: 'Production URL')] ?string $url = null,
 ): void {
     // Github details for API calls
-    $ghToken = trim(run('gh auth token', quiet: true, allowFailure: false)->getOutput());
-    $ghRepo = trim(run('gh repo view --json nameWithOwner --jq .nameWithOwner | cat', quiet: true)->getOutput());
+    $ghToken = trim(run('gh auth token', context: context()->withQuiet())->getOutput());
+    $ghRepo = trim(run('gh repo view --json nameWithOwner --jq .nameWithOwner | cat', context: context()->withQuiet())->getOutput());
 
-    $environment = $environment ?? io()->ask('Which kind of environment?', 'staging');
+    $environment = $environment ?? io()->askQuestion(new ChoiceQuestion('Which environment?', SUGGESTED_ENVS, SUGGESTED_DEFAULT_ENV));
+    io()->info('Setting up env for ' . $environment . ' environment…');
+
     $command = <<<CMD
     curl --silent -L \
     -X PUT \
@@ -97,9 +98,9 @@ function initGithubEnv(
     https://api.github.com/repos/$ghRepo/environments/$environment \
     -d '{"deployment_branch_policy":{"protected_branches":false,"custom_branch_policies":true}}'
     CMD;
-    run($command, quiet: true);
+    run($command, context: context()->withQuiet());
 
-    $deployBranch = $branch ?? io()->ask('Deployment branch?', 'master');
+    $deployBranch = $branch ?? io()->ask('Deployment branch?', $environment === 'production' ? 'master' : 'develop');
     run(sprintf(
         'gh api --silent --method POST -H "Accept: application/vnd.github+json" "/repos/%1$s/environments/%2$s/deployment-branch-policies" -f name=%3$s',
         $ghRepo,
@@ -117,10 +118,24 @@ function initGithubEnv(
 
 #[AsTask(name: 'init', namespace: 'github:variables', description: 'Init repository variables')]
 function initGithubVariables(
-    #[AsOption(description: 'Kind of environment', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\Github\autocomple_suggested_env')] ?string $environment = null,
+    #[AsOption(description: 'Kind of environment', autocomplete: 'MonsieurBiz\SyliusSetup\Castor\autocomple_suggested_env')] ?string $environment = null,
     #[AsOption(description: 'Production branch name')] ?string $branch = null,
     #[AsOption(description: 'Production URL')] ?string $url = null,
 ): void {
-    run('gh variable set PRODUCTION_BRANCH -b ' . ($branch ?? io()->ask('PRODUCTION_BRANCH?', 'master')));
-    run('gh variable set PRODUCTION_URL -b ' . ($url ?? io()->ask('PRODUCTION_URL?', 'https://www.monsieurbiz.com')));
+    $environment = $environment ?? io()->askQuestion(new ChoiceQuestion('Which environment?', SUGGESTED_ENVS, SUGGESTED_DEFAULT_ENV));
+    io()->info('Setting up variables for ' . $environment . ' environment…');
+
+    if ($environment === 'production') {
+        $branch = $branch ?? io()->ask('PRODUCTION_BRANCH?', 'master');
+        $url = $url ?? io()->ask('PRODUCTION_URL?', 'https://project.preprod.monsieurbiz.com');
+        return;
+    }
+
+    if ($environment === 'staging') {
+        $branch = $branch ?? io()->ask('STAGING_BRANCH?', 'develop');
+        $url = $url ?? io()->ask('STAGING_URL?', 'https://project.staging.monsieurbiz.cloud');
+        return;
+    }
+
+    io()->error('Unknown environment, please provide a valid one in : ' . implode(', ', SUGGESTED_ENVS));
 }

@@ -1,8 +1,9 @@
 .DEFAULT_GOAL := help
 SHELL=/bin/bash
 APP_DIR=apps/sylius
+APP_NAME=sylius
 FIXTURES_DIR=src/Resources/fixtures
-DOMAINS=${APP_DIR}:sylius
+DOMAINS=${APP_DIR}:${APP_NAME}
 SYLIUS_FIXTURES_SUITE=default
 SYMFONY=cd ${APP_DIR} && symfony
 COMPOSER=${SYMFONY} composer
@@ -17,7 +18,7 @@ BUILD_THEME_IN_DOCKER:=0
 export USER_UID=$(shell id -u)
 
 DC_DIR=infra/dev
-DC_PREFIX=sylius
+DC_PREFIX=${APP_NAME}
 APP_ENV=dev
 
 ifndef DC_PREFIX

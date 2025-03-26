@@ -6,8 +6,11 @@ use Castor\Attribute\AsOption;
 use Castor\Attribute\AsTask;
 
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use function Castor\context;
 use function Castor\io;
 use function Castor\run;
+use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_DEFAULT_ENV;
+use const MonsieurBiz\SyliusSetup\Castor\SUGGESTED_ENVS;
 
 #[AsTask(name: 'setup', namespace: 'clevercloud', description: 'Init Clever Cloud application and addons')]
 function cleverSetup(
@@ -24,6 +27,9 @@ function cleverSetup(
     cleverIsRequired();
 
     $project = initProject($code, $name, $org, $env, $hostname);
+    if (io()->confirm("Do you want to setup credentials for protected environment?", null !== $username || null !== $password)) {
+        setupHtpasswd($username, $password);
+    }
     setupPHP($project, $php);
     setupMySQL($project, $mysql);
     setupFSBucket($project);
@@ -48,7 +54,7 @@ function initProject(string $type, ?string $name = null, ?string $org = null, ?s
     };
     $project->name = $name ?? io()->ask('What is the name of your project?');
     $project->org = $org ?? io()->ask('What is the organization ID from Clever cloud (its name or its code starting with org_)?');
-    $project->env = $env ?? io()->askQuestion(new ChoiceQuestion('Which environment?', ['staging', 'prod'], 'prod'));
+    $project->env = $env ?? io()->askQuestion(new ChoiceQuestion('Which environment?', SUGGESTED_ENVS, SUGGESTED_DEFAULT_ENV));
     $project->id = sprintf('%s-%s', $type, $project->env);
     $project->hostname = sprintf($hostname, $project->id);
 
@@ -87,7 +93,7 @@ function setupPHP(object $project, ?string $plan = null): void
         $project->org,
         $project->env,
         $project->id
-    ), allowFailure: false);
+    ));
 
     run(sprintf(
         'clever scale --alias "%1$s" --flavor %2$s',
@@ -159,8 +165,8 @@ function setupEnv(object $project): string
         ));
     };
 
-    $bucketHost = trim(run(sprintf('clever env -a %1$s | grep BUCKET_HOST | cut -d"=" -f2', $project->env), quiet: true)->getOutput());
-    $databaseUri = trim(run(sprintf('clever env -a %1$s | grep MYSQL_ADDON_URI | cut -d"=" -f2', $project->env), quiet: true)->getOutput());
+    $bucketHost = trim(run(sprintf('clever env -a %1$s | grep BUCKET_HOST | cut -d"=" -f2', $project->env), context: context()->withQuiet())->getOutput());
+    $databaseUri = trim(run(sprintf('clever env -a %1$s | grep MYSQL_ADDON_URI | cut -d"=" -f2', $project->env), context: context()->withQuiet())->getOutput());
     $hostname = io()->ask('Which domain for fixtures?', default: $project->hostname);
 
     $setEnv('CC_PHP_VERSION', '8.2');
@@ -224,13 +230,13 @@ function setupHtpasswd(
 
 function cleverIsRequired(): void
 {
-    $clever = run('clever --version', quiet: true, allowFailure: true);
+    $clever = run('clever --version', context: context()->withQuiet()->withAllowFailure());
     if (!$clever->isSuccessful()) {
         io()->error('You should install the Clever Cloud CLI first: https://www.clever-cloud.com/doc/clever-tools/getting_started/');
         exit(1);
     }
 
-    $profile = run('clever profile', quiet: true, allowFailure: true);
+    $profile = run('clever profile', context: context()->withQuiet()->withAllowFailure());
     if (!$profile->isSuccessful()) {
         io()->error('You should login to your Clever Cloud account first using the "clever login" command.');
         exit(1);

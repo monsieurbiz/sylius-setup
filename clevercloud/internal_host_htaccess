@@ -1,0 +1,7 @@
+
+    # If the Host contains ".internal." and HTTP_VIA doesn't contains "redirectionio-proxy"
+    # then we are in the internal network and we can allow the access to the app
+    # so return a 410 status code
+    RewriteCond %{HTTP_HOST} \.internal\. [NC]
+    RewriteCond %{HTTP:VIA} !redirectionio-proxy
+    RewriteRule ^ - [R=410,L]

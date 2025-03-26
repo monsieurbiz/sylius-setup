@@ -43,5 +43,5 @@ endif
 
 server.stop: ## Stop the local webserver
 ifneq (${SYMFONY_USE_DOCKER_ONLY},1)
-	${SYMFONY} local:server:stop
+	${SYMFONY} local:server:stop || true
 endif

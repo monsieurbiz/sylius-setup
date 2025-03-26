@@ -111,17 +111,70 @@ jobs:
             -   run: make test.container
 
             -   name: Prepare deployment artifact
-                if: ${{ github.ref_name == vars.PRODUCTION_BRANCH }}
+                if: ${{ github.ref_name == vars.PRODUCTION_BRANCH || github.ref_name == vars.STAGING_BRANCH }}
                 run: |
                     rm -rf apps/sylius/var/{cache,log} apps/sylius/public/media
                     tar --exclude-vcs --exclude node_modules -cvzf ~/application.tgz ./apps/sylius
 
             -   name: Upload deployment artifact
-                if: ${{ github.ref_name == vars.PRODUCTION_BRANCH }}
+                if: ${{ github.ref_name == vars.PRODUCTION_BRANCH || github.ref_name == vars.STAGING_BRANCH }}
                 uses: actions/upload-artifact@v3
                 with:
                     name: application
                     path: ~/application.tgz
+
+    staging_deployment:
+
+        name: Deploy to staging
+
+        if: ${{ github.ref_name == vars.STAGING_BRANCH }}
+
+        needs: tests
+
+        runs-on: ubuntu-latest
+
+        concurrency:
+            group: staging-deployment
+            cancel-in-progress: true
+
+        environment:
+            name: staging
+            url: ${{ vars.STAGING_URL }}
+
+        env:
+            CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+            CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+
+        steps:
+            -   uses: actions/checkout@v3
+
+            -   name: Install clever-tools
+                run: |
+                    npm install -g clever-tools
+                    clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+
+            -   name: Prepare deployment
+                run: |
+                    mkdir -p ~/deployment
+                    cp .clever.json ~/deployment/
+                    cp -rv clevercloud ~/deployment/
+                    cd ~/deployment
+                    git config --global user.email "madamebiz@monsieurbiz.com"
+                    git config --global user.name "Madame Biz"
+                    git init
+
+            -   name: Download deployment artifact
+                uses: actions/download-artifact@v3
+                with:
+                    name: application
+                    path: ~/deployment/
+
+            -   name: Deploy
+                run: |
+                    cd ~/deployment
+                    git add -A
+                    git commit -m "Deploy"
+                    clever deploy -a staging --force
 
     production_deployment:
 
