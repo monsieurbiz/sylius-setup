@@ -59,6 +59,19 @@ function initProject(string $type, ?string $org = null, ?string $region = null, 
         public array $buckets;
     };
 
+    $projects = [];
+    if (file_exists('.projects.json')) {
+        $projects = json_decode(file_get_contents('.projects.json'), true);
+        // Choose an existing project
+        $projectIds = array_keys($projects);
+        array_unshift($projectIds, 'New project'); // Option to create new one
+        $project->id = io()->askQuestion(new ChoiceQuestion('Which project?', $projectIds, $projectIds[0]));
+        $project = $projects[$project->id] ?? null;
+        if (null !== $project) {
+            return (object) $project;
+        }
+    }
+
     $project->org = $org ?? io()->ask('What is the organization ID from Clever cloud (its name or its code starting with org_)?');
     $project->region = $region ?? io()->ask('What is the region for you infrastructure?', 'par');
     $env = $env ?? io()->askQuestion(new ChoiceQuestion('Which environment?', SUGGESTED_ENVS, SUGGESTED_DEFAULT_ENV));
@@ -70,6 +83,10 @@ function initProject(string $type, ?string $org = null, ?string $region = null, 
     $suggestedHostName = $env === 'prod' ? 'project.preprod.monsieurbiz.cloud' : 'project.staging.monsieurbiz.cloud';
     $project->hostname = $hostname ?? io()->ask('What is the hostname of your project?', $suggestedHostName);
     $project->buckets = $buckets ?? [];
+
+    // Save project in json in `.project.json`
+    $projects[$project->id] = $project;
+    file_put_contents('.projects.json', json_encode($projects, JSON_PRETTY_PRINT));
 
     return $project;
 }
