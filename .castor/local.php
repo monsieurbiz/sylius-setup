@@ -152,8 +152,11 @@ function cleanUp(): void
     if (io()->confirm('Are you sure? This is a destructive action!', false)) {
         run('rm -rf .castor');
         run('rm castor.php');
-        if (io()->confirm('Do you want to commit your `composer.lock` file?', false)) {
+        if (io()->confirm('Do you want to commit your `composer.lock` file?', true)) {
             run('sed -i "" -e "/composer.lock/d" .gitignore', context: context()->withAllowFailure()->withWorkingDirectory('apps/sylius/'));
+        }
+        if (io()->confirm('Do you want to commit your `phpstan.neon` file?', true)) {
+            run('sed -i "" -e "/phpstan.neon/d" .gitignore', context: context()->withAllowFailure()->withWorkingDirectory('apps/sylius/'));
         }
         io()->success('Clean up done!');
     }
