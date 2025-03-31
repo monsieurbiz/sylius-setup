@@ -360,10 +360,10 @@ function cleverSetupProxy(?object $project = null, ?string $internalDomainSuffix
     $proxyAlias = sprintf('%s-proxy', $project->env);
     $proxyName = sprintf('%s-proxy', $project->id);
     $applicationAlias = $project->env;
-    $setEnv = function ($name, $value) use ($proxyAlias): void {
+    $setEnv = function ($applicationAlias, $name, $value): void {
         run(sprintf(
             'clever env --alias %1$s set %2$s "%3$s"',
-            $proxyAlias,
+            $applicationAlias,
             $name,
             $value
         ));
@@ -393,22 +393,23 @@ function cleverSetupProxy(?object $project = null, ?string $internalDomainSuffix
     run(sprintf('clever domain --alias %1$s add %2$s', $proxyAlias, $domain));
 
     // Set proxy env vars
-    $setEnv('CC_RUN_COMMAND', './redirection-agent/redirectionio-agent --config-file ./agent.yml');
-    $setEnv('CC_PRE_BUILD_HOOK', './clevercloud/pre_build_hook.sh');
-    $setEnv('CC_PRE_RUN_HOOK', './clevercloud/pre_run_hook.sh');
-    $setEnv('PORT', '8080');
-    $setEnv('RIO_INSTANCE_NAME', sprintf('%s CleverCloud', $project->id));
-    $setEnv('RIO_PRESERVE_HOST', 'false');
-    $setEnv('RIO_ADD_RULE_IDS_HEADER', 'true');
-    $setEnv('RIO_COMPRESS', 'true');
-    $setEnv('RIO_REQUEST_BODY_SIZE_LIMIT', '200MB');
-    $setEnv('RIO_LOG_LEVEL', 'info');
-    $setEnv('RIO_PROJECT_KEY', $rioProjectKey ?? ''); // Use command option or complete on Clever Cloud
-    $setEnv('RIO_FORWARD', sprintf('http://%s/', $internalDomain));
-    $setEnv('RIO_TRUSTED_PROXIES', '');
+    $setEnv($proxyAlias, 'CC_RUN_COMMAND', './redirection-agent/redirectionio-agent --config-file ./agent.yml');
+    $setEnv($proxyAlias, 'CC_PRE_BUILD_HOOK', './clevercloud/pre_build_hook.sh');
+    $setEnv($proxyAlias, 'CC_PRE_RUN_HOOK', './clevercloud/pre_run_hook.sh');
+    $setEnv($proxyAlias, 'PORT', '8080');
+    $setEnv($proxyAlias, 'RIO_INSTANCE_NAME', sprintf('%s CleverCloud', $project->id));
+    $setEnv($proxyAlias, 'RIO_PRESERVE_HOST', 'false');
+    $setEnv($proxyAlias, 'RIO_ADD_RULE_IDS_HEADER', 'true');
+    $setEnv($proxyAlias, 'RIO_COMPRESS', 'true');
+    $setEnv($proxyAlias, 'RIO_REQUEST_BODY_SIZE_LIMIT', '200MB');
+    $setEnv($proxyAlias, 'RIO_LOG_LEVEL', 'info');
+    $setEnv($proxyAlias, 'RIO_PROJECT_KEY', $rioProjectKey ?? ''); // Use command option or complete on Clever Cloud
+    $setEnv($proxyAlias, 'RIO_FORWARD', sprintf('https://%s/', $internalDomain));
+    $setEnv($proxyAlias, 'RIO_TRUSTED_PROXIES', '');
 
-    // Remove "force https" on app
-    run(sprintf('clever config --alias %s update --disable-force-https', $applicationAlias));
+    // Set application env vars
+    $setEnv($applicationAlias, 'TRUSTED_PROXIES', 'REMOTE_ADDR');
+    $setEnv($applicationAlias, 'USE_INTERNAL_HOST', 'true');
 
     // Try to restart the proxy. This command may fail, but the proxy will continue to run.
     run(sprintf('clever restart --without-cache --alias %s', $proxyAlias), context: context()->withAllowFailure());
