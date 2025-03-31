@@ -414,6 +414,15 @@ function cleverSetupProxy(?object $project = null, ?string $internalDomainSuffix
     // Try to restart the proxy. This command may fail, but the proxy will continue to run.
     run(sprintf('clever restart --without-cache --alias %s', $proxyAlias), context: context()->withAllowFailure());
     io()->success('Your proxy is ready!');
+
+    // Display the configuration to add in the application
+    io()->warning(<<<EOF
+    Update your `apps/sylius/config/packages/framework.yaml` with these lines
+    
+    framework:
+        trusted_proxies: '%env(CC_REVERSE_PROXY_IPS)%,%env(TRUSTED_PROXIES)%'
+        trusted_headers: [ 'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix' ]
+    EOF);
 }
 
 function getApplicationId(string $org, string $name): ?string
