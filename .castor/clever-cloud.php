@@ -397,6 +397,7 @@ function cleverSetupProxy(?object $project = null, ?string $internalDomainSuffix
     $setEnv($proxyAlias, 'CC_PRE_BUILD_HOOK', './clevercloud/pre_build_hook.sh');
     $setEnv($proxyAlias, 'CC_PRE_RUN_HOOK', './clevercloud/pre_run_hook.sh');
     $setEnv($proxyAlias, 'PORT', '8080');
+    $setEnv($proxyAlias, 'RIO_ALLOW_INVALID_CERTIFICATES', 'true');
     $setEnv($proxyAlias, 'RIO_INSTANCE_NAME', sprintf('%s CleverCloud', $project->id));
     $setEnv($proxyAlias, 'RIO_PRESERVE_HOST', 'false');
     $setEnv($proxyAlias, 'RIO_ADD_RULE_IDS_HEADER', 'true');
