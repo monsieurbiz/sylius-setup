@@ -48,8 +48,11 @@ export -f protect_application
 function build_sylius() {
   cd ${APP_HOME}/apps/sylius
   php -d memory_limit=-1 ./bin/console sylius:install:assets -v
-  php -d memory_limit=-1 ./bin/console doctrine:migr:migr -n -v --all-or-nothing
+  php -d memory_limit=-1 ./bin/console doctrine:migr:migr -n -v
   php -d memory_limit=-1 ./bin/console messenger:setup-transports -n -v
+  if [ "${RUN_FIXTURES+x}" ] && [ "${RUN_FIXTURES}" == "true" ]; then
+    php -d memory_limit=-1 ./bin/console sylius:fixtures:load -n ${SYLIUS_FIXTURES_SUITE} -v
+  fi
 }
 export -f build_sylius
 
